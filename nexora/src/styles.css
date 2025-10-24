@@ -1,0 +1,521 @@
+/* src/styles.css */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: #f5f7fb; /* softer light background */
+  color: #1f2937; /* slate-800 */
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* If you want the *entire dashboard* content to be centered and have a max width */
+  /* max-width: 1521px; */
+  /* margin: 0 auto; */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 1521px; 
+  max-width: 100%;     /* ensures it doesn’t overflow on smaller screens */
+  /* margin: 0 auto; -- If you want the header itself to be centered within a larger body */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+/* Brand block: logo + separator + text */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  height: 48px;
+  width: auto;
+  display: inline-block;
+}
+
+.brand-sep {
+  color: #cfcfcf;
+  font-weight: 600;
+  margin-left: 4px;
+  margin-right: 6px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.tagline {
+  font-style: italic;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Sign-out button */
+.sign-out-btn {
+  margin: 1rem 1.5rem;
+  padding: 0.75rem;
+  background-color: #ff4d4f; /* red */
+  color: #fff; /* white text */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.sign-out-btn:hover {
+  background-color: #e04344; /* slightly darker red on hover */
+}
+
+/* Header right dropdown */
+.header-right .dropdown {
+  padding: 0.5rem 2rem 0.5rem 0.5rem; /* space for arrow */
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: #000; /* black text */
+  cursor: pointer;
+
+  /* Remove default arrow */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Custom black arrow */
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23000' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.header-right .dropdown option {
+  color: #000; /* black text for options */
+  background-color: #fff;
+}
+
+.dashboard-content {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 1640px;      /* overall app content width */
+  margin: 0 auto;         /* centers the content horizontally */
+}
+
+
+.menu {
+  width: 250px;
+  background-color: #fff;
+  padding: 1.5rem 0;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.hamburger-menu {
+  width: 24px;
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 0.75rem;
+}
+
+.hamburger-menu span {
+  height: 3px;
+  width: 100%;
+  background-color: #333;
+  border-radius: 2px;
+}
+
+.menu-items {
+  list-style: none;
+  flex: 1;
+}
+
+.menu-items li {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-items li:hover {
+  background-color: #f5f5f5;
+}
+
+.menu-items li.active {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+  font-weight: 500;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Section containers */
+.summary-container,
+.ntp-container,
+.technographics-container,
+.financial-section-container {
+  background: linear-gradient(180deg, #ffffff, #fafbff);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+
+h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #0f172a; /* slate-900 */
+}
+
+.section-subtle-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  margin: 0.75rem 0 1.25rem;
+}
+
+.empty-component {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  color: #999;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.5rem; /* extra right padding for arrow */
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+
+  /* Remove default arrow */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Custom arrow (dark gray) */
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.filter-group select option {
+  color: #333;
+  background-color: #fff;
+}
+
+/* Tables */
+/* This table-container is for the specific table within the financial-table-wrapper */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Allow horizontal scroll, but not vertical */
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.table-container table {
+  min-width: 1100px; /* ensures wide layout; can scroll horizontally */
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: #f3f4f6; /* gray-100 */
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Specific styling for the nested header rows in Financial table */
+.table-container table thead tr:first-child th {
+  background-color: #eef2ff; /* indigo-50 */
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid #dbeafe;
+  top: 0;
+}
+
+.table-container table thead tr:nth-child(2) th {
+  background-color: #f3f4f6;
+  top: 48px; /* align below first header row */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+tr:hover {
+  background-color: #fafafa;
+}
+
+.action-items {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between search bar and button */
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.15); /* semi-transparent background */
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  font-size: 14px;
+  outline: none;
+  color: #000; /* text color */
+}
+
+.search-icon {
+  margin-left: 5px;
+  color: #555;
+  font-size: 16px;
+}
+
+
+.download-csv-btn {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.download-csv-btn:hover {
+  background-color: #45a049;
+}
+
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between search bar and button */
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.15); /* semi-transparent background */
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  font-size: 14px;
+  outline: none;
+  color: #000; /* text color */
+}
+
+.search-icon {
+  margin-left: 5px;
+  color: #555;
+  font-size: 16px;
+}
+
+.download-csv-button {
+  background-color: #28a745; /* Green color for download */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.download-csv-button:hover {
+  background-color: #218838;
+}
+
+/* Company Summary (martech/Summary.jsx) */
+.company-summary {
+  background: linear-gradient(180deg, #ffffff, #fafbff);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
+}
+
+.company-summary__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.company-summary__controls label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.company-summary__input {
+  flex: 0 1 360px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.company-summary__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.company-summary__panel {
+  background: #fff;
+  border: 1px solid #dfe3ea;
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem 0.75rem;
+}
+
+.company-summary__panel-title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* globe removed */
+
+.company-summary__pie {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.company-summary__pie-graphic {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 8px solid #f8fafc;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
+}
+
+.company-summary__legend {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 0.4rem 0.75rem;
+}
+
+.company-summary__legend li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.company-summary__legend .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+.company-summary__legend .value {
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1024px) {
+  .company-summary__grid {
+    grid-template-columns: 1fr;
+  }
+  .company-summary__pie {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
