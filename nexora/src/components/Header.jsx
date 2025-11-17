@@ -23,14 +23,14 @@ const Header = ({ onDropdownChange, onLogout }) => {
         </div>
       </div>
       <div className="header-right" style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-        <select 
+        {/* <select 
           className="dropdown" 
           value={selectedOption} 
           onChange={handleDropdownChange}
         >
           <option value="Martech">Martech</option>
           <option value="Market">Market</option>
-        </select>
+        </select> */}
         <button className="sign-out-btn" onClick={() => onLogout && onLogout()}>Sign Out</button>
       </div>
     </header>

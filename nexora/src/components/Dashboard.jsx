@@ -14,7 +14,7 @@ import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
 
 const Dashboard = ({ onLogout }) => {
-  const [activeView, setActiveView] = useState('Martech');
+  const [activeView, setActiveView] = useState('Market');
   const [activeSection, setActiveSection] = useState('Summary');
 
   const handleDropdownChange = (value) => {
