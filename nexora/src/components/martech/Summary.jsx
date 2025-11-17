@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useIndustry } from '../../context/IndustryContext';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -46,133 +46,81 @@ const adjustColor = (hex, deltaL, deltaS) => {
     return `hsl(${h}, ${s}%, ${l}%)`;
 };
 
-const allCompaniesData = {
-    TechCorp: {
-        industries: [
-            { label: 'Information Technology', value: 57, color: '#1e90ff' },
-            { label: 'Marketing & Advertising', value: 29, color: '#1f2937' },
-            { label: 'Financial Services', value: 7, color: '#f59e0b' },
-            { label: 'Retail', value: 4, color: '#10b981' },
-            { label: 'Telecom', value: 2, color: '#ef4444' },
-            { label: 'Other', value: 1, color: '#8b5cf6' },
-        ],
-        countries: [{ country: 'USA', techFocus: 'IT', value: 57 }],
-        continents: [
-            { id: 'north-america', city: 'New York', color: 'dodgerblue', coordinates: [40.7128, -74.006], value: 57 },
-            { id: 'europe', city: 'London', color: 'mediumseagreen', coordinates: [51.5074, -0.1278], value: 29 },
-            { id: 'asia', city: 'Singapore', color: 'gold', coordinates: [1.3521, 103.8198], value: 14 },
-        ],
-    },
-    InnovateX: {
-        industries: [
-            { label: 'Marketing & Advertising', value: 40, color: '#1f2937' },
-            { label: 'Software', value: 30, color: '#1e90ff' },
-            { label: 'Sales', value: 20, color: '#f59e0b' },
-            { label: 'E-commerce', value: 10, color: '#10b981' },
-        ],
-        countries: [{ country: 'Germany', techFocus: 'Marketing', value: 22 }],
-        continents: [
-            { id: 'north-america', city: 'San Francisco', color: 'dodgerblue', coordinates: [37.773972, -122.431297], value: 48 },
-            { id: 'europe', city: 'Berlin', color: 'mediumseagreen', coordinates: [52.52, 13.405], value: 22 },
-            { id: 'asia', city: 'Tokyo', color: 'gold', coordinates: [35.6762, 139.6503], value: 30 },
-        ],
-    },
-    DataFlow: {
-        industries: [
-            { label: 'Data Platform', value: 38, color: '#8b5cf6' },
-            { label: 'Analytics', value: 32, color: '#22c55e' },
-            { label: 'Financial Services', value: 20, color: '#f59e0b' },
-            { label: 'Consulting', value: 10, color: '#ef4444' },
-        ],
-        countries: [{ country: 'India', techFocus: 'Analytics', value: 40 }],
-        continents: [
-            { id: 'north-america', city: 'Chicago', color: 'dodgerblue', coordinates: [41.8781, -87.6298], value: 35 },
-            { id: 'europe', city: 'Paris', color: 'mediumseagreen', coordinates: [48.8566, 2.3522], value: 25 },
-            { id: 'asia', city: 'Bengaluru', color: 'gold', coordinates: [12.9716, 77.5946], value: 40 },
-        ],
-    },
-    WebGenius: {
-        industries: [
-            { label: 'Information Technology', value: 60, color: '#1e90ff' },
-            { label: 'Design Services', value: 25, color: '#1f2937' },
-            { label: 'Other', value: 15, color: '#8b5cf6' },
-        ],
-        countries: [{ country: 'UK', techFocus: 'CMS', value: 25 }],
-        continents: [
-            { id: 'north-america', city: 'Toronto', color: 'dodgerblue', coordinates: [43.6532, -79.3832], value: 50 },
-            { id: 'europe', city: 'London', color: 'mediumseagreen', coordinates: [51.5074, -0.1278], value: 35 },
-            { id: 'asia', city: 'Shanghai', color: 'gold', coordinates: [31.2304, 121.4737], value: 15 },
-        ],
-    },
-    EvolveCo: {
-        industries: [
-            { label: 'Financial Services', value: 50, color: '#f59e0b' },
-            { label: 'Information Technology', value: 30, color: '#1e90ff' },
-            { label: 'Other', value: 20, color: '#8b5cf6' },
-        ],
-        countries: [{ country: 'Brazil', techFocus: 'Finance', value: 50 }],
-        continents: [
-            { id: 'north-america', city: 'Mexico City', color: 'dodgerblue', coordinates: [19.4326, -99.1332], value: 40 },
-            { id: 'europe', city: 'Dublin', color: 'mediumseagreen', coordinates: [53.3498, -6.2603], value: 20 },
-            { id: 'south-america', color: 'red', coordinates: [-23.5505, -46.6333], value: 40 },
-        ],
-    },
-};
+// Removed fake data - using only real data from API
 
-// No hardcoded data - using real data from Technographics
+// Function to generate Sankey data from real technographics data
+const getSankeyData = (technographicsData, selectedCategories = []) => {
+    if (!technographicsData || technographicsData.length === 0) {
+        // Return empty structure if no data
+        return { nodes: [], links: [], allCategories: [] };
+    }
 
-// Modified to use blue colors for all categories and products
-const getSankeyData = () => {
-    return {
-        nodes: [
-            { id: 'Technologies', value: 498, color: '#1f2937' },
-            { id: 'Marketing', value: 188, color: '#3b82f6' }, // Blue
-            { id: 'CRM', value: 101, color: '#3b82f6' }, // Blue
-            { id: 'Sales', value: 78, color: '#3b82f6' }, // Blue
-            { id: 'No Detection', value: 50, color: '#3b82f6' }, // Blue
-
-            { id: 'hubspot', value: 50, color: '#3b82f6' }, // Blue
-            { id: 'google analytics', value: 40, color: '#3b82f6' }, // Blue
-            { id: 'Salesforce Marketing', value: 30, color: '#3b82f6' }, // Blue
-            { id: 'Google Ads', value: 20, color: '#3b82f6' }, // Blue
-
-            { id: 'Salesforce', value: 45, color: '#3b82f6' }, // Blue
-            { id: 'Pipedrive', value: 25, color: '#3b82f6' }, // Blue
-
-            { id: 'Zoominfo', value: 30, color: '#3b82f6' },
-        ],
-        links: [
-            { source: 'Technologies', target: 'Marketing', value: 188 },
-            { source: 'Technologies', target: 'CRM', value: 101 },
-            { source: 'Technologies', target: 'Sales', value: 78 },
-            { source: 'Technologies', target: 'No Detection', value: 50 },
-
-            { source: 'Marketing', target: 'hubspot', value: 50 },
-            { source: 'Marketing', target: 'google analytics', value: 40 },
-            { source: 'Marketing', target: 'Salesforce Marketing', value: 30 },
-            { source: 'Marketing', target: 'Google Ads', value: 20 },
-
-            { source: 'CRM', target: 'Salesforce', value: 45 },
-            { source: 'CRM', target: 'Pipedrive', value: 25 },
-
-            { source: 'Sales', target: 'Zoominfo', value: 30 },
-        ],
-    };
-};
-
-const aggregateWorldMapData = (data) => {
-    const continentMap = {};
-    Object.values(data).forEach((company) => {
-        company.continents.forEach((continent) => {
-            if (continentMap[continent.id]) {
-                continentMap[continent.id].value += continent.value;
-            } else {
-                continentMap[continent.id] = { ...continent };
-            }
-        });
+    // Get all unique categories first
+    const allCategoriesSet = new Set();
+    technographicsData.forEach(row => {
+        const category = row.category || 'Other';
+        allCategoriesSet.add(category);
     });
-    return Object.values(continentMap);
+    const allCategories = Array.from(allCategoriesSet).sort();
+
+    // Filter data by selected categories if any are selected
+    let filteredData = technographicsData;
+    if (selectedCategories.length > 0) {
+        filteredData = technographicsData.filter(row => {
+            const category = row.category || 'Other';
+            return selectedCategories.includes(category);
+        });
+    }
+
+    // Aggregate data by category and technology
+    const categoryMap = {};
+    const technologyMap = {};
+
+    filteredData.forEach(row => {
+        const category = row.category || 'Other';
+        const technology = row.technology || 'Unknown';
+
+        // Count categories
+        if (!categoryMap[category]) {
+            categoryMap[category] = 0;
+        }
+        categoryMap[category]++;
+
+        // Count technologies per category
+        const key = `${category}|${technology}`;
+        if (!technologyMap[key]) {
+            technologyMap[key] = 0;
+        }
+        technologyMap[key]++;
+    });
+
+    // Calculate total technologies
+    const totalTechnologies = filteredData.length;
+
+    // Create nodes and links
+    const nodes = [];
+    const links = [];
+
+    // Add root node
+    nodes.push({ id: 'Technologies', value: totalTechnologies, color: '#1f2937' });
+
+    // Add category nodes and links from Technologies to Categories
+    Object.entries(categoryMap).forEach(([category, count]) => {
+        nodes.push({ id: category, value: count, color: '#3b82f6' });
+        links.push({ source: 'Technologies', target: category, value: count });
+    });
+
+    // Add technology nodes and links from Categories to Technologies
+    Object.entries(technologyMap).forEach(([key, count]) => {
+        const [category, technology] = key.split('|');
+        nodes.push({ id: technology, value: count, color: '#3b82f6' });
+        links.push({ source: category, target: technology, value: count });
+    });
+
+    return { nodes, links, allCategories };
 };
+
+// Removed unused aggregateWorldMapData function
 
 const CHART_HEIGHT = 380;
 const COLUMN_X = {
@@ -185,9 +133,16 @@ const NODE_VERTICAL_SPACING = 32;
 
 const LINK_STROKE_WIDTH = 2;
 
-const generateSimpleLinkPath = (x1, y1, x2, y2) => {
+// Generate Sankey-style path with proper curves
+const generateSankeyLinkPath = (x1, y1, x2, y2, width = 2) => {
     const midX = (x1 + x2) / 2;
-    return `M ${x1} ${y1} C ${midX + 20} ${y1}, ${midX - 20} ${y2}, ${x2} ${y2}`;
+    const halfWidth = width / 2;
+
+    // Create a path that represents the flow with variable width
+    const topPath = `M ${x1} ${y1 - halfWidth} C ${midX} ${y1 - halfWidth}, ${midX} ${y2 - halfWidth}, ${x2} ${y2 - halfWidth}`;
+    const bottomPath = `L ${x2} ${y2 + halfWidth} C ${midX} ${y2 + halfWidth}, ${midX} ${y1 + halfWidth}, ${x1} ${y1 + halfWidth} Z`;
+
+    return topPath + bottomPath;
 };
 
 const SankeyGraph = ({ data }) => {
@@ -196,9 +151,16 @@ const SankeyGraph = ({ data }) => {
 
     const rawNodeMap = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
 
+    // Dynamically identify categories: nodes that have Technologies as source
+    const categoryIds = useMemo(() => {
+        return new Set(links.filter(l => l.source === 'Technologies').map(l => l.target));
+    }, [links]);
+
     const techNode = nodes.find(n => n.id === 'Technologies');
-    const categories = nodes.filter(n => ['Marketing', 'CRM', 'Sales', 'No Detection'].includes(n.id));
-    const products = nodes.filter(n => !['Technologies', 'Marketing', 'CRM', 'Sales', 'No Detection'].includes(n.id));
+    const categories = nodes.filter(n => categoryIds.has(n.id));
+
+    // Products are nodes that are not Technologies and not categories
+    const products = nodes.filter(n => n.id !== 'Technologies' && !categoryIds.has(n.id));
 
     const totalTechnologies = techNode?.value || 1;
     const maxCategoryValue = Math.max(...categories.map(c => c.value), 1);
@@ -270,15 +232,20 @@ const SankeyGraph = ({ data }) => {
             ? COLUMN_X.Technologies + 50
             : COLUMN_X.Category + NODE_WIDTH;
 
-        const targetX = link.target === 'Marketing' || link.target === 'CRM' || link.target === 'Sales' || link.target === 'No Detection'
+        // Check if target is a category (dynamically)
+        const targetX = categoryIds.has(link.target)
             ? COLUMN_X.Category : COLUMN_X.Products;
 
         const sourceY = sourceNode.y;
         const targetY = targetNode.y;
 
+        // Calculate link width based on value (min 3, max 20)
+        const maxValue = Math.max(...links.map(l => l.value));
+        const linkWidth = Math.max(3, Math.min(20, (link.value / maxValue) * 15));
+
         const color = targetNode.color;
 
-        const path = generateSimpleLinkPath(sourceX, sourceY, targetX, targetY);
+        const path = generateSankeyLinkPath(sourceX, sourceY, targetX, targetY, linkWidth);
 
         const highlighted = isLinkHighlighted(link.source, link.target);
 
@@ -286,11 +253,18 @@ const SankeyGraph = ({ data }) => {
             <path
                 key={`${link.source}-${link.target}`}
                 d={path}
-                stroke={color}
-                strokeWidth={highlighted ? LINK_STROKE_WIDTH * 2 : LINK_STROKE_WIDTH}
-                fill="none"
-                opacity={highlighted ? 0.8 : 0.3}
-                style={{ transition: 'stroke-width 0.15s ease-out, opacity 0.15s ease-out' }}
+                fill={color}
+                opacity={highlighted ? 0.7 : 0.4}
+                style={{
+                    transition: 'opacity 0.2s ease-out',
+                    cursor: 'pointer'
+                }}
+                onMouseEnter={() => {
+                    setHoveredNode(link.source);
+                }}
+                onMouseLeave={() => {
+                    setHoveredNode(null);
+                }}
             />
         );
     };
@@ -405,11 +379,18 @@ const SankeyGraph = ({ data }) => {
     return (
         <div style={sankeyStyles.container}>
             <svg style={sankeyStyles.svgOverlay}>
+                <defs>
+                    {/* Add subtle gradient for links */}
+                    <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.6 }} />
+                        <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0.4 }} />
+                    </linearGradient>
+                </defs>
                 {links.map(renderLink)}
             </svg>
 
-            <h3 style={{ position: 'absolute', top: '10px', left: `${COLUMN_X.Category}px`, fontSize: '14px', color: '#6b7280' }}>Category</h3>
-            <h3 style={{ position: 'absolute', top: '10px', left: `${COLUMN_X.Products}px`, fontSize: '14px', color: '#6b7280' }}>Products</h3>
+            <h3 style={{ position: 'absolute', top: '10px', left: `${COLUMN_X.Category}px`, fontSize: '14px', fontWeight: '600', color: '#6b7280' }}>Category</h3>
+            <h3 style={{ position: 'absolute', top: '10px', left: `${COLUMN_X.Products}px`, fontSize: '14px', fontWeight: '600', color: '#6b7280' }}>Products</h3>
 
             {techNode && renderNode(techNode, totalTechnologies, 'Technologies', 'center')}
             {categories.map(cat => renderNode(cat, maxCategoryValue, 'Category', 'left'))}
@@ -432,25 +413,15 @@ const chartStyle = {
     border: '1px solid #e5e7eb',
 };
 
-const WorldMap = ({ data }) => (
-    <div style={chartStyle}>
-        <h4 style={{ margin: '0 0 10px', color: '#374151' }}>World Map: Global Footprint (Placeholder)</h4>
-        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-            **Geographical distribution** of the aggregated data, highlighting regions by count or revenue.
-        </p>
-        <p style={{ color: '#9ca3af', fontSize: '12px' }}>
-            *Data points aggregated across {data.length} continents.*
-        </p>
-    </div>
-);
+// Removed unused WorldMap component
 
 // Updated HeatMap Component
 const HeatMap = () => {
     const { technologyData, availableRegions } = useIndustry();
-    
+
     // Initialize state with India as default
     const [country, setCountry] = useState('India');
-    
+
     // Update country when regions become available, prefer India if available
     React.useEffect(() => {
         if (availableRegions.length > 0 && !country) {
@@ -492,9 +463,9 @@ const HeatMap = () => {
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    style={{ 
-                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, 
-                        backgroundRepeat: 'no-repeat', 
+                    style={{
+                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'right 1rem center',
                         WebkitAppearance: 'none',
                         appearance: 'none'
@@ -515,7 +486,7 @@ const HeatMap = () => {
 
             {/* Heatmap Display */}
             {countryData ? (
-                    <div className="space-y-4">
+                <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-3">
                         {Object.entries(countryData).map(([tech, value]) => {
                             // Blue gradient color: lighter at low %, darker at high %
@@ -546,10 +517,10 @@ const HeatMap = () => {
                         </svg>
                     </div>
                     <p className="text-gray-600">
-                        {regions.length === 0 
-                            ? 'Please visit the Technographics page to load data.' 
-                            : country 
-                                ? `No technology data available for "${country}".` 
+                        {regions.length === 0
+                            ? 'Loading technology data...'
+                            : country
+                                ? `No technology data available for "${country}".`
                                 : 'Select a region to see technology adoption.'}
                     </p>
                 </div>
@@ -648,13 +619,128 @@ const PieAnnotations = React.memo(({ data, total, hoveredLabel }) => {
 });
 
 const Summary = () => {
-    const { industryData } = useIndustry();
-    const overallSankeyData = useMemo(() => getSankeyData(), []);
-    const overallMapData = useMemo(() => aggregateWorldMapData(allCompaniesData), []);
-    const overallHeatMapData = useMemo(() => Object.values(allCompaniesData).map(c => c.countries[0]), []);
+    const { industryData, setIndustryData, setTechnologyData, setAvailableRegions } = useIndustry();
+    const [technographicsData, setTechnographicsData] = useState([]);
+    const [loadingSankey, setLoadingSankey] = useState(true);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [selectedIndustries, setSelectedIndustries] = useState([]);
+    const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
+
+    // Fetch technographics data and update context
+    useEffect(() => {
+        const fetchTechnographicsData = async () => {
+            try {
+                setLoadingSankey(true);
+                const response = await fetch('/api/technographics');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setTechnographicsData(data);
+
+                // Calculate industry counts from the table data
+                const industryCounts = {};
+                data.forEach(row => {
+                    const industry = row.industry || 'Other';
+                    industryCounts[industry] = (industryCounts[industry] || 0) + 1;
+                });
+
+                // Convert to array format for pie chart
+                const industryArray = Object.entries(industryCounts).map(([label, value]) => ({
+                    label,
+                    value
+                }));
+
+                // Update the shared context with real industry data
+                setIndustryData(industryArray);
+
+                // Calculate technology adoption by region and category
+                const techByRegion = {};
+                const regions = new Set();
+
+                data.forEach(row => {
+                    const region = row.region || 'Unknown';
+                    const category = row.category || 'Other';
+
+                    regions.add(region);
+
+                    if (!techByRegion[region]) {
+                        techByRegion[region] = {};
+                    }
+
+                    if (!techByRegion[region][category]) {
+                        techByRegion[region][category] = 0;
+                    }
+
+                    techByRegion[region][category]++;
+                });
+
+                // Calculate percentages for each region
+                const techDataWithPercentages = {};
+                Object.keys(techByRegion).forEach(region => {
+                    const total = Object.values(techByRegion[region]).reduce((sum, count) => sum + count, 0);
+                    techDataWithPercentages[region] = {};
+
+                    Object.keys(techByRegion[region]).forEach(category => {
+                        const percentage = total > 0 ? Math.round((techByRegion[region][category] / total) * 100) : 0;
+                        techDataWithPercentages[region][category] = percentage;
+                    });
+                });
+
+                setTechnologyData(techDataWithPercentages);
+                setAvailableRegions(Array.from(regions).sort());
+            } catch (e) {
+                console.error("Failed to fetch Technographics data:", e);
+            } finally {
+                setLoadingSankey(false);
+            }
+        };
+
+        fetchTechnographicsData();
+    }, [setIndustryData, setTechnologyData, setAvailableRegions]);
+
+    const sankeyDataResult = useMemo(() => getSankeyData(technographicsData, selectedCategories), [technographicsData, selectedCategories]);
+    const overallSankeyData = { nodes: sankeyDataResult.nodes, links: sankeyDataResult.links };
+    const availableCategories = sankeyDataResult.allCategories || [];
+
+    // Set default categories when data is loaded
+    useEffect(() => {
+        if (availableCategories.length > 0 && selectedCategories.length === 0) {
+            const defaultCategories = ['AI/ML', 'BI Tools', 'Back-End Technologies'];
+            const categoriesToSelect = defaultCategories.filter(cat => availableCategories.includes(cat));
+            if (categoriesToSelect.length > 0) {
+                setSelectedCategories(categoriesToSelect);
+            }
+        }
+    }, [availableCategories, selectedCategories.length]);
 
     const [hoveredPieData, setHoveredPieData] = useState(null);
     const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+
+    // Handle category selection (max 3)
+    const handleCategoryToggle = (category) => {
+        setSelectedCategories(prev => {
+            if (prev.includes(category)) {
+                return prev.filter(c => c !== category);
+            } else if (prev.length < 3) {
+                return [...prev, category];
+            }
+            return prev;
+        });
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showCategoryDropdown && !event.target.closest('.category-dropdown-container')) {
+                setShowCategoryDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showCategoryDropdown]);
 
     // Color palette for industries
     const colorPalette = [
@@ -669,28 +755,74 @@ const Summary = () => {
         '#FF5722', // Deep Orange
         '#9C27B0', // Deep Purple
     ];
-    
-    // Use real data from Technographics if available, otherwise use fallback
-    const overallIndustryPieData = useMemo(() => {
+
+    // Get all available industries for the filter dropdown
+    const availableIndustries = useMemo(() => {
         if (industryData && industryData.length > 0) {
-            return industryData
-                .map((item, index) => ({
-                    ...item,
-                    color: colorPalette[index % colorPalette.length]
-                }))
-                .sort((a, b) => b.value - a.value);
+            const filteredData = industryData.filter(item =>
+                item.label !== 'N/A' &&
+                item.label !== 'Not found' &&
+                item.label.toLowerCase() !== 'n/a' &&
+                item.label.toLowerCase() !== 'not found'
+            );
+            return filteredData.sort((a, b) => b.value - a.value).map(item => item.label);
         }
-        // Fallback data if no real data available yet
-        return [
-            { label: 'Information Technology', value: 147, color: '#64B5F6' },
-            { label: 'Financial Services', value: 77, color: '#1565C0' },
-            { label: 'Marketing & Advertising', value: 32, color: '#4CAF50' },
-            { label: 'Data Platform', value: 38, color: '#FF9800' },
-            { label: 'Other', value: 36, color: '#FDD835' },
-            { label: 'Software', value: 30, color: '#00897B' },
-            { label: 'Analytics', value: 69, color: '#673AB7' },
-        ].sort((a, b) => b.value - a.value);
+        return [];
     }, [industryData]);
+
+    // Handle industry selection (max 10)
+    const handleIndustryToggle = (industry) => {
+        setSelectedIndustries(prev => {
+            if (prev.includes(industry)) {
+                return prev.filter(i => i !== industry);
+            } else if (prev.length < 10) {
+                return [...prev, industry];
+            }
+            return prev;
+        });
+    };
+
+    // Close industry dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showIndustryDropdown && !event.target.closest('.industry-dropdown-container')) {
+                setShowIndustryDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showIndustryDropdown]);
+
+    // Use only real data from Technographics - no fallback
+    // Filter by selected industries or show top 10
+    const overallIndustryPieData = useMemo(() => {
+        if (!industryData || industryData.length === 0) {
+            return [];
+        }
+
+        // Filter out N/A and Not found
+        const filteredData = industryData.filter(item =>
+            item.label !== 'N/A' &&
+            item.label !== 'Not found' &&
+            item.label.toLowerCase() !== 'n/a' &&
+            item.label.toLowerCase() !== 'not found'
+        );
+
+        // If industries are selected, filter by them, otherwise show top 10
+        let dataToShow;
+        if (selectedIndustries.length > 0) {
+            dataToShow = filteredData.filter(item => selectedIndustries.includes(item.label));
+        } else {
+            const sortedData = filteredData.sort((a, b) => b.value - a.value);
+            dataToShow = sortedData.slice(0, 10);
+        }
+
+        return dataToShow.map((item, index) => ({
+            ...item,
+            color: colorPalette[index % colorPalette.length]
+        }));
+    }, [industryData, selectedIndustries, colorPalette]);
 
     const totalValue = overallIndustryPieData.reduce((sum, s) => sum + s.value, 0) || 1;
 
@@ -886,12 +1018,263 @@ const Summary = () => {
 
             <div style={styles.grid2up}>
                 <div style={styles.summaryPanel}>
-                    <div style={styles.panelTitle}>Technology Stack Breakdown</div>
-                    <SankeyGraph data={overallSankeyData} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
+                        <div style={styles.panelTitle} className="m-0 border-0 pb-0">Technology Stack Breakdown</div>
+
+                        {/* Category Filter Dropdown */}
+                        {availableCategories.length > 0 && (
+                            <div className="category-dropdown-container" style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                                    style={{
+                                        padding: '6px 12px',
+                                        backgroundColor: 'white',
+                                        color: '#374151',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '13px',
+                                        fontWeight: '500',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        transition: 'all 0.15s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#f9fafb';
+                                        e.currentTarget.style.borderColor = '#9ca3af';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.borderColor = '#d1d5db';
+                                    }}
+                                >
+                                    Filter {selectedCategories.length > 0 && `(${selectedCategories.length})`}
+                                    <span style={{ fontSize: '10px', color: '#6b7280' }}>▼</span>
+                                </button>
+
+                                {showCategoryDropdown && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        right: 0,
+                                        marginTop: '8px',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                        zIndex: 1000,
+                                        minWidth: '250px',
+                                        maxHeight: '400px',
+                                        overflowY: 'auto'
+                                    }}>
+                                        <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                                            <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                                                Select Categories (Max 3)
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                {selectedCategories.length}/3 selected
+                                            </div>
+                                            {selectedCategories.length > 0 && (
+                                                <button
+                                                    onClick={() => setSelectedCategories([])}
+                                                    style={{
+                                                        marginTop: '8px',
+                                                        padding: '4px 8px',
+                                                        fontSize: '12px',
+                                                        backgroundColor: '#ef4444',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Clear All
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div style={{ padding: '8px' }}>
+                                            {availableCategories.map(category => (
+                                                <label
+                                                    key={category}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        padding: '10px 12px',
+                                                        cursor: selectedCategories.includes(category) || selectedCategories.length < 3 ? 'pointer' : 'not-allowed',
+                                                        borderRadius: '6px',
+                                                        transition: 'background-color 0.15s',
+                                                        backgroundColor: selectedCategories.includes(category) ? '#eff6ff' : 'transparent',
+                                                        opacity: !selectedCategories.includes(category) && selectedCategories.length >= 3 ? 0.5 : 1
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (selectedCategories.includes(category) || selectedCategories.length < 3) {
+                                                            e.currentTarget.style.backgroundColor = '#f3f4f6';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = selectedCategories.includes(category) ? '#eff6ff' : 'transparent';
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedCategories.includes(category)}
+                                                        onChange={() => handleCategoryToggle(category)}
+                                                        disabled={!selectedCategories.includes(category) && selectedCategories.length >= 3}
+                                                        style={{
+                                                            marginRight: '10px',
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            cursor: selectedCategories.includes(category) || selectedCategories.length < 3 ? 'pointer' : 'not-allowed'
+                                                        }}
+                                                    />
+                                                    <span style={{ fontSize: '14px', color: '#374151', fontWeight: selectedCategories.includes(category) ? '600' : '400' }}>
+                                                        {category}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {loadingSankey ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '380px', color: '#6b7280' }}>
+                            Loading technology data...
+                        </div>
+                    ) : overallSankeyData.nodes.length === 0 ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '380px', color: '#6b7280' }}>
+                            No technology data available.
+                        </div>
+                    ) : (
+                        <SankeyGraph data={overallSankeyData} />
+                    )}
                 </div>
 
                 <div style={styles.summaryPanel}>
-                    <div style={styles.panelTitle}>Industry Wise Distribution</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #f3f4f6', paddingBottom: '10px' }}>
+                        <div style={styles.panelTitle} className="m-0 border-0 pb-0">Industry Wise Distribution</div>
+
+                        {/* Industry Filter Dropdown */}
+                        {availableIndustries.length > 0 && (
+                            <div className="industry-dropdown-container" style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => setShowIndustryDropdown(!showIndustryDropdown)}
+                                    style={{
+                                        padding: '6px 12px',
+                                        backgroundColor: 'white',
+                                        color: '#374151',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '13px',
+                                        fontWeight: '500',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        transition: 'all 0.15s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#f9fafb';
+                                        e.currentTarget.style.borderColor = '#9ca3af';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.borderColor = '#d1d5db';
+                                    }}
+                                >
+                                    Filter {selectedIndustries.length > 0 && `(${selectedIndustries.length})`}
+                                    <span style={{ fontSize: '10px', color: '#6b7280' }}>▼</span>
+                                </button>
+
+                                {showIndustryDropdown && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        right: 0,
+                                        marginTop: '8px',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                        zIndex: 1000,
+                                        minWidth: '250px',
+                                        maxHeight: '400px',
+                                        overflowY: 'auto'
+                                    }}>
+                                        <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                                            <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                                                Select Industries (Max 10)
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                {selectedIndustries.length}/10 selected
+                                            </div>
+                                            {selectedIndustries.length > 0 && (
+                                                <button
+                                                    onClick={() => setSelectedIndustries([])}
+                                                    style={{
+                                                        marginTop: '8px',
+                                                        padding: '4px 8px',
+                                                        fontSize: '12px',
+                                                        backgroundColor: '#ef4444',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Clear All
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div style={{ padding: '8px' }}>
+                                            {availableIndustries.map(industry => (
+                                                <label
+                                                    key={industry}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        padding: '10px 12px',
+                                                        cursor: selectedIndustries.includes(industry) || selectedIndustries.length < 10 ? 'pointer' : 'not-allowed',
+                                                        borderRadius: '6px',
+                                                        transition: 'background-color 0.15s',
+                                                        backgroundColor: selectedIndustries.includes(industry) ? '#eff6ff' : 'transparent',
+                                                        opacity: !selectedIndustries.includes(industry) && selectedIndustries.length >= 10 ? 0.5 : 1
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (selectedIndustries.includes(industry) || selectedIndustries.length < 10) {
+                                                            e.currentTarget.style.backgroundColor = '#f3f4f6';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = selectedIndustries.includes(industry) ? '#eff6ff' : 'transparent';
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIndustries.includes(industry)}
+                                                        onChange={() => handleIndustryToggle(industry)}
+                                                        disabled={!selectedIndustries.includes(industry) && selectedIndustries.length >= 10}
+                                                        style={{
+                                                            marginRight: '10px',
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            cursor: selectedIndustries.includes(industry) || selectedIndustries.length < 10 ? 'pointer' : 'not-allowed'
+                                                        }}
+                                                    />
+                                                    <span style={{ fontSize: '14px', color: '#374151', fontWeight: selectedIndustries.includes(industry) ? '600' : '400' }}>
+                                                        {industry}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     <div style={styles.summaryPie}>
                         {/* PIE CHART SECTION */}
                         <div style={styles.pieContainer}>
@@ -991,7 +1374,7 @@ const Summary = () => {
 
                 <div style={styles.summaryPanel}>
                     <div style={styles.panelTitle}>Technology Adoption</div>
-                    <HeatMap data={overallHeatMapData} />
+                    <HeatMap />
                 </div>
             </div>
             <style>{`
