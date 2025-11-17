@@ -5,7 +5,7 @@ const Technographics = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { setIndustryData } = useIndustry();
+  const { setIndustryData, setTechnologyData, setAvailableRegions } = useIndustry();
   const [filters, setFilters] = useState({
     companyName: '',
     region: '',
@@ -66,6 +66,42 @@ const Technographics = () => {
         
         // Update the shared context with real industry data
         setIndustryData(industryArray);
+        
+        // Calculate technology adoption by region and category
+        const techByRegion = {};
+        const regions = new Set();
+        
+        data.forEach(row => {
+          const region = row.region || 'Unknown';
+          const category = row.category || 'Other';
+          
+          regions.add(region);
+          
+          if (!techByRegion[region]) {
+            techByRegion[region] = {};
+          }
+          
+          if (!techByRegion[region][category]) {
+            techByRegion[region][category] = 0;
+          }
+          
+          techByRegion[region][category]++;
+        });
+        
+        // Calculate percentages for each region
+        const techDataWithPercentages = {};
+        Object.keys(techByRegion).forEach(region => {
+          const total = Object.values(techByRegion[region]).reduce((sum, count) => sum + count, 0);
+          techDataWithPercentages[region] = {};
+          
+          Object.keys(techByRegion[region]).forEach(category => {
+            const percentage = total > 0 ? Math.round((techByRegion[region][category] / total) * 100) : 0;
+            techDataWithPercentages[region][category] = percentage;
+          });
+        });
+        
+        setTechnologyData(techDataWithPercentages);
+        setAvailableRegions(Array.from(regions).sort());
       } catch (e) {
         setError(e.message);
         console.error("Failed to fetch Technographics data:", e);
@@ -75,7 +111,7 @@ const Technographics = () => {
     };
 
     fetchData();
-  }, [setIndustryData]);
+  }, [setIndustryData, setTechnologyData, setAvailableRegions]);
 
   const getUniqueOptions = (key) => {
     if (!tableData) return [];

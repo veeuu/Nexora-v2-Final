@@ -119,18 +119,7 @@ const allCompaniesData = {
     },
 };
 
-// Simplified data structure for the heatmap — only BI Tools, Cloud, SAP, OS, VMware
-const countryTechData = {
-    India: { Cloud: 85, SAP: 75, OS: 65, VMware: 55, 'BI Tools': 60 },
-    USA: { Cloud: 95, SAP: 60, OS: 80, VMware: 70, 'BI Tools': 82 },
-    Germany: { Cloud: 75, SAP: 90, OS: 70, VMware: 85, 'BI Tools': 64 },
-    UK: { Cloud: 80, SAP: 65, OS: 75, VMware: 60, 'BI Tools': 70 },
-    Japan: { Cloud: 70, SAP: 80, OS: 85, VMware: 75, 'BI Tools': 61 },
-    Brazil: { Cloud: 65, SAP: 70, OS: 60, VMware: 80, 'BI Tools': 56 }
-};
-
-// Array of available countries for the dropdown
-const availableCountries = Object.keys(countryTechData);
+// No hardcoded data - using real data from Technographics
 
 // Modified to use blue colors for all categories and products
 const getSankeyData = () => {
@@ -457,8 +446,17 @@ const WorldMap = ({ data }) => (
 
 // Updated HeatMap Component
 const HeatMap = () => {
-    // Initialize state to 'India' as requested
-    const [country, setCountry] = useState('India');
+    const { technologyData, availableRegions } = useIndustry();
+    
+    // Initialize state with first available region or fallback
+    const [country, setCountry] = useState('');
+    
+    // Update country when regions become available
+    React.useEffect(() => {
+        if (availableRegions.length > 0 && !country) {
+            setCountry(availableRegions[0]);
+        }
+    }, [availableRegions, country]);
 
     // Function to calculate color based on value (0-100 scale)
     const getColor = (value) => {
@@ -475,16 +473,17 @@ const HeatMap = () => {
         return `rgb(${r}, ${g}, ${b})`;
     };
 
-    // Get data for selected country
-    const countryData = country && countryTechData[country] ? countryTechData[country] : null;
+    // Use only real data from Technographics
+    const countryData = technologyData[country] || null;
+    const regions = availableRegions;
 
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 w-full">
 
-            {/* Country Dropdown */}
+            {/* Region Dropdown */}
             <div className="mb-6">
                 <label htmlFor="country-select" className="block text-sm font-medium text-gray-700 mb-1">
-                    Select Country :
+                    Select Region :
                 </label>
                 <select
                     id="country-select"
@@ -493,7 +492,7 @@ const HeatMap = () => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none"
                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
                 >
-                    {availableCountries.map((countryName) => (
+                    {regions.map((countryName) => (
                         <option key={countryName} value={countryName}>
                             {countryName}
                         </option>
@@ -534,7 +533,11 @@ const HeatMap = () => {
                         </svg>
                     </div>
                     <p className="text-gray-600">
-                        {country ? `No data available for "${country}".` : 'Select a country to see the technology adoption heatmap.'}
+                        {regions.length === 0 
+                            ? 'Please visit the Technographics page to load data.' 
+                            : country 
+                                ? `No technology data available for "${country}".` 
+                                : 'Select a region to see technology adoption.'}
                     </p>
                 </div>
             )}
