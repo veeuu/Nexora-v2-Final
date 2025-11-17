@@ -448,13 +448,15 @@ const WorldMap = ({ data }) => (
 const HeatMap = () => {
     const { technologyData, availableRegions } = useIndustry();
     
-    // Initialize state with first available region or fallback
-    const [country, setCountry] = useState('');
+    // Initialize state with India as default
+    const [country, setCountry] = useState('India');
     
-    // Update country when regions become available
+    // Update country when regions become available, prefer India if available
     React.useEffect(() => {
         if (availableRegions.length > 0 && !country) {
-            setCountry(availableRegions[0]);
+            // Check if India is in the list, otherwise use first region
+            const defaultRegion = availableRegions.includes('India') ? 'India' : availableRegions[0];
+            setCountry(defaultRegion);
         }
     }, [availableRegions, country]);
 
@@ -489,14 +491,25 @@ const HeatMap = () => {
                     id="country-select"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition appearance-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    style={{ 
+                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, 
+                        backgroundRepeat: 'no-repeat', 
+                        backgroundPosition: 'right 1rem center',
+                        WebkitAppearance: 'none',
+                        appearance: 'none'
+                    }}
+                    disabled={regions.length === 0}
                 >
-                    {regions.map((countryName) => (
-                        <option key={countryName} value={countryName}>
-                            {countryName}
-                        </option>
-                    ))}
+                    {regions.length === 0 ? (
+                        <option value="">Loading regions...</option>
+                    ) : (
+                        regions.map((countryName) => (
+                            <option key={countryName} value={countryName}>
+                                {countryName}
+                            </option>
+                        ))
+                    )}
                 </select>
             </div>
 
