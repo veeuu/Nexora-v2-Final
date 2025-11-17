@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import { useIndustry } from '../../context/IndustryContext';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
 
@@ -630,24 +631,50 @@ const PieAnnotations = React.memo(({ data, total, hoveredLabel }) => {
     );
 });
 
-// --- FIXED DATA FOR PIE CHART (MODIFIED) ---
-const overallIndustryPieData = [
-    { label: 'Information Technology', value: 147, color: '#64B5F6' }, // Light Blue
-    { label: 'Financial Services', value: 77, color: '#1565C0' }, // Dark Blue
-    { label: 'Marketing & Advertising', value: 32, color: '#4CAF50' },// Deep Purple (Changed from Red)
-    { label: 'Data Platform', value: 38, color: '#FF9800' }, // Orange
-    { label: 'Other', value: 36, color: '#FDD835' }, // Yellow// Green
-    { label: 'Software', value: 30, color: '#00897B' },
-    { label: 'Analytics', value: 69, color: '#673AB7' }, // Teal (Added to match total from image values)
-].sort((a, b) => b.value - a.value);
-
 const Summary = () => {
+    const { industryData } = useIndustry();
     const overallSankeyData = useMemo(() => getSankeyData(), []);
     const overallMapData = useMemo(() => aggregateWorldMapData(allCompaniesData), []);
     const overallHeatMapData = useMemo(() => Object.values(allCompaniesData).map(c => c.countries[0]), []);
 
     const [hoveredPieData, setHoveredPieData] = useState(null);
     const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+
+    // Color palette for industries
+    const colorPalette = [
+        '#64B5F6', // Light Blue
+        '#1565C0', // Dark Blue
+        '#4CAF50', // Green
+        '#FF9800', // Orange
+        '#FDD835', // Yellow
+        '#00897B', // Teal
+        '#673AB7', // Purple
+        '#E91E63', // Pink
+        '#FF5722', // Deep Orange
+        '#9C27B0', // Deep Purple
+    ];
+    
+    // Use real data from Technographics if available, otherwise use fallback
+    const overallIndustryPieData = useMemo(() => {
+        if (industryData && industryData.length > 0) {
+            return industryData
+                .map((item, index) => ({
+                    ...item,
+                    color: colorPalette[index % colorPalette.length]
+                }))
+                .sort((a, b) => b.value - a.value);
+        }
+        // Fallback data if no real data available yet
+        return [
+            { label: 'Information Technology', value: 147, color: '#64B5F6' },
+            { label: 'Financial Services', value: 77, color: '#1565C0' },
+            { label: 'Marketing & Advertising', value: 32, color: '#4CAF50' },
+            { label: 'Data Platform', value: 38, color: '#FF9800' },
+            { label: 'Other', value: 36, color: '#FDD835' },
+            { label: 'Software', value: 30, color: '#00897B' },
+            { label: 'Analytics', value: 69, color: '#673AB7' },
+        ].sort((a, b) => b.value - a.value);
+    }, [industryData]);
 
     const totalValue = overallIndustryPieData.reduce((sum, s) => sum + s.value, 0) || 1;
 
@@ -764,7 +791,7 @@ const Summary = () => {
             justifyContent: 'flex-start',
             gap: '30px',
             padding: '10px',
-            height: '300px',
+            minHeight: '300px',
         },
         pieContainer: {
             width: `${SVG_SIZE}px`,
@@ -774,6 +801,7 @@ const Summary = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            overflow: 'visible',
         },
         pieGraphic: {
             width: `${PIE_RADIUS * 2}px`,
@@ -950,6 +978,16 @@ const Summary = () => {
                     <HeatMap data={overallHeatMapData} />
                 </div>
             </div>
+            <style>{`
+                @media (max-width: 768px) {
+                    [style*="display: flex"][style*="gap: 30px"][style*="minHeight: 300px"] {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        padding: 40px 20px !important;
+                        min-height: auto !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

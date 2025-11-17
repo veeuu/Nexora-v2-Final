@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useIndustry } from '../../context/IndustryContext';
 
 const Technographics = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { setIndustryData } = useIndustry();
   const [filters, setFilters] = useState({
     companyName: '',
     region: '',
@@ -48,6 +50,22 @@ const Technographics = () => {
         }
         const data = await response.json();
         setTableData(data);
+        
+        // Calculate industry counts from the table data
+        const industryCounts = {};
+        data.forEach(row => {
+          const industry = row.industry || 'Other';
+          industryCounts[industry] = (industryCounts[industry] || 0) + 1;
+        });
+        
+        // Convert to array format for pie chart
+        const industryArray = Object.entries(industryCounts).map(([label, value]) => ({
+          label,
+          value
+        }));
+        
+        // Update the shared context with real industry data
+        setIndustryData(industryArray);
       } catch (e) {
         setError(e.message);
         console.error("Failed to fetch Technographics data:", e);
@@ -57,7 +75,7 @@ const Technographics = () => {
     };
 
     fetchData();
-  }, []);
+  }, [setIndustryData]);
 
   const getUniqueOptions = (key) => {
     if (!tableData) return [];

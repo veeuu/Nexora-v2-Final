@@ -1021,25 +1021,40 @@ tr:hover {
     font-size: 1.1rem !important;
   }
 
-  /* Pie Chart Container */
+  /* Pie Chart Container - Center pie only on mobile */
   [style*="display: flex"][style*="gap: 30px"] {
     flex-direction: column !important;
-    gap: 15px !important;
+    gap: 20px !important;
     height: auto !important;
     align-items: center !important;
+    justify-content: center !important;
+    padding: 40px 20px !important;
   }
 
-  /* Pie Container */
+  /* Pie Container - Larger with space for radial labels */
   [style*="width: 300px"][style*="height: 300px"] {
-    width: 250px !important;
-    height: 250px !important;
+    width: 300px !important;
+    height: 300px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
   }
 
-  /* Legend */
+  /* Pie SVG - ensure labels don't get cut off */
+  [style*="position: absolute"][style*="overflow: visible"] {
+    overflow: visible !important;
+  }
+
+  /* Legend - Show below pie on mobile */
   [style*="maxHeight: 300px"][style*="overflowY: auto"] {
     max-height: none !important;
     width: 100% !important;
-    padding-left: 0 !important;
+    padding: 0 20px !important;
+    margin-top: 30px !important;
+  }
+
+  /* Pie graphic wrapper */
+  [style*="borderRadius: 50%"][style*="position: absolute"] {
+    position: relative !important;
   }
 
   /* Sankey Graph Container */
@@ -1061,6 +1076,13 @@ tr:hover {
   [style*="padding: 15px"]:has([style*="height: 380px"]) {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Pie chart panel - ensure overflow visible for labels */
+  [style*="padding: 15px"]:has([style*="width: 300px"][style*="height: 300px"]) {
+    overflow: visible !important;
+    padding: 15px !important;
+    min-height: 500px !important;
   }
 
   /* Intent Table */
@@ -1095,10 +1117,16 @@ tr:hover {
     font-size: 1rem !important;
   }
 
-  /* Pie Container - Smaller */
+  /* Pie Container - Maintain good size on small mobile */
   [style*="width: 300px"][style*="height: 300px"] {
-    width: 200px !important;
-    height: 200px !important;
+    width: 260px !important;
+    height: 260px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Pie Chart Container - More padding on small mobile */
+  [style*="display: flex"][style*="gap: 30px"] {
+    padding: 30px 15px !important;
   }
 
   /* Legend Items */

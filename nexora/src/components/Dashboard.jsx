@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { IndustryProvider } from '../context/IndustryContext';
 import Header from './Header';
 import Menu from './Menu';
 import MartechSummary from './martech/Summary';
@@ -69,20 +70,22 @@ const Dashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="dashboard">
-      <Header onDropdownChange={handleDropdownChange} />
-      <div className="dashboard-content">
-        <Menu 
-          activeSection={activeSection}
-          onMenuClick={handleMenuClick}
-          menuItems={getMenuItems()}
-          onLogout={onLogout}
-        />
-        <main className="main-content">
-          {renderActiveSection()}
-        </main>
+    <IndustryProvider>
+      <div className="dashboard">
+        <Header onDropdownChange={handleDropdownChange} />
+        <div className="dashboard-content">
+          <Menu 
+            activeSection={activeSection}
+            onMenuClick={handleMenuClick}
+            menuItems={getMenuItems()}
+            onLogout={onLogout}
+          />
+          <main className="main-content">
+            {renderActiveSection()}
+          </main>
+        </div>
       </div>
-    </div>
+    </IndustryProvider>
   );
 };
 
