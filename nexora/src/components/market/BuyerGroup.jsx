@@ -134,7 +134,7 @@ const BuyerGroup = () => {
           </tbody>
         </table>
       </div>
-       <style jsx>{`
+       <style>{`
         .table-container {
           max-height: 400px;
           overflow-x: auto;

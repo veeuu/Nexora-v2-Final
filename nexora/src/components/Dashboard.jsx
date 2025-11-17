@@ -8,7 +8,7 @@ import MartechTechnographics from './martech/Technographics';
 import MarketSummary from './market/Summary';
 // import MarketNTP from './market/NTP'; // Commented out as requested
 import MarketFinancial from './market/Financial';
-import StockPerformance from './market/StockPerformance';
+import StockPerformance from './market/StockPerformanceold';
 import BuyerGroup from './market/BuyerGroup';
 import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
@@ -70,12 +70,13 @@ const Dashboard = ({ onLogout }) => {
 
   return (
     <div className="dashboard">
-  <Header onDropdownChange={handleDropdownChange} onLogout={onLogout} />
+      <Header onDropdownChange={handleDropdownChange} />
       <div className="dashboard-content">
         <Menu 
           activeSection={activeSection}
           onMenuClick={handleMenuClick}
           menuItems={getMenuItems()}
+          onLogout={onLogout}
         />
         <main className="main-content">
           {renderActiveSection()}

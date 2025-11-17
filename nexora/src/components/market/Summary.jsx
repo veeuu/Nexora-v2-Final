@@ -62,7 +62,12 @@ const Summary = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/financial/wide');
+        const response = await fetch('/api/financial/wide', {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -100,11 +105,18 @@ const Summary = () => {
     const fetchChartData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/stock/${selectedCompany.id}/${timeRange}`);
+        console.log('Fetching chart data for:', selectedCompany.id, timeRange);
+        const response = await fetch(`/api/stock/${selectedCompany.id}/${timeRange}`, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('Chart data received:', data.length, 'data points');
         
         // Format the 'Time' for display on the X-axis
         const formattedData = data.map(item => {
@@ -147,15 +159,22 @@ const Summary = () => {
       return; // Do nothing if not on 1D view or no company is selected
     }
 
-    const realTimeInterval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/stock/quote/${selectedCompany.id}`);
-        if (!response.ok) {
-          // Don't throw an error, just log it, so one failed poll doesn't break the UI
-          console.error(`Real-time poll failed: ${response.status}`);
-          return;
-        }
-        const latestQuote = await response.json();
+    // Add a small delay before starting polling to ensure backend is ready
+    const startDelay = setTimeout(() => {
+      const realTimeInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`/api/stock/quote/${selectedCompany.id}`, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          if (!response.ok) {
+            // Don't throw an error, just log it, so one failed poll doesn't break the UI
+            console.error(`Real-time poll failed: ${response.status}`);
+            return;
+          }
+          const latestQuote = await response.json();
         
         setChartData(currentData => {
           if (currentData.length === 0) {
@@ -175,12 +194,16 @@ const Summary = () => {
           updatedData[updatedData.length - 1] = { ...latestQuote, Time: newTime };
           return updatedData;
         });
-      } catch (e) {
-        console.error("Failed to poll real-time data:", e);
-      }
-    }, 5000); // Poll every 5 seconds
+        } catch (e) {
+          console.error("Failed to poll real-time data:", e);
+        }
+      }, 5000); // Poll every 5 seconds
 
-    return () => clearInterval(realTimeInterval); // Cleanup interval on component unmount or when deps change
+      // Store interval ID for cleanup
+      return () => clearInterval(realTimeInterval);
+    }, 2000); // Wait 2 seconds before starting polling
+
+    return () => clearTimeout(startDelay); // Cleanup timeout on component unmount or when deps change
   }, [selectedCompany, timeRange]);
 
   // Handle dropdown change
@@ -203,54 +226,91 @@ const Summary = () => {
 
   // --- Render Charting Component based on Time Range ---
   const renderChart = () => {
-    if (!selectedCompany) return null;
+    if (!selectedCompany) {
+      console.log('No company selected');
+      return null;
+    }
     
-    const ChartComponent = isIntraday ? LineChart : AreaChart;
-    const ChartItem = isIntraday ? Line : Area;
-    const dataKey = 'Close';
+    console.log('Rendering chart with', chartData.length, 'data points');
+    console.log('First data point:', chartData[0]);
+    console.log('Chart data sample:', chartData.slice(0, 3));
+    console.log('Data keys:', chartData[0] ? Object.keys(chartData[0]) : 'No data');
+    console.log('Close values:', chartData.slice(0, 5).map(d => d.Close));
+    
+    if (chartData.length === 0) {
+      return <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>No data available</div>;
+    }
+
+    // Check if data has required fields
+    const hasValidData = chartData.every(d => 
+      d.Close !== undefined && 
+      d.Open !== undefined && 
+      d.High !== undefined && 
+      d.Low !== undefined
+    );
+
+    if (!hasValidData) {
+      console.error('Invalid data structure:', chartData[0]);
+      return <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>Data format error - check console</div>;
+    }
 
     return (
-      <ChartComponent
+      <LineChart
+        width={800}
+        height={350}
         data={chartData}
-        margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 10, right: 60, left: 10, bottom: 30 }}
       >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
         <XAxis 
           dataKey="Time" 
-          tick={{ fill: '#555' }} 
-          axisLine={{ stroke: '#555' }} 
-          tickMargin={10} /* Adds space between X-axis labels and the chart */
+          tick={{ fill: '#666', fontSize: 12 }} 
+          stroke="#000"
         />
         <YAxis
-          domain={[minPrice, maxPrice]}
+          tick={{ fill: '#666', fontSize: 12 }}
+          stroke="#000"
           orientation="right"
-          tickFormatter={(value) => selectedCompany.currency + ' ' + value.toFixed(2)}
-          tick={{ fill: '#555' }}
-          axisLine={{ stroke: '#555' }}
-          tickMargin={10} /* Adds space between Y-axis labels and the chart */
         />
-        <Tooltip content={<CustomTooltip timeRange={timeRange} />} labelFormatter={(label) => label} />
-        <Legend wrapperStyle={{ paddingTop: '10px' }} />
+        <Tooltip />
+        <Legend />
         
-        <ChartItem
-          type="monotone"
-          dataKey={dataKey}
-          stroke={primaryColor}
-          strokeWidth={2}
-          dot={false}
+        <Line 
+          type="monotone" 
+          dataKey="Close" 
+          stroke="#E74C3C" 
+          strokeWidth={2} 
+          dot={false} 
           name="Closing Price"
-          fillOpacity={isIntraday ? 0 : 0.2} // Light fill for historical area
-          fill={isIntraday ? '' : primaryColor}
         />
-        
-        {/* Additional OHLC lines for visual comparison */}
-        <>
-            <Line type="monotone" dataKey="Open" stroke="#8884d8" strokeDasharray="5 5" strokeWidth={1} dot={false} name="Opening Price" />
-            <Line type="monotone" dataKey="High" stroke="#FF7300" strokeDasharray="3 3" strokeWidth={1} dot={false} name="Daily High" />
-            <Line type="monotone" dataKey="Low" stroke="#0088FE" strokeDasharray="3 3" strokeWidth={1} dot={false} name="Daily Low" />
-        </>
-
-      </ChartComponent>
+        <Line 
+          type="monotone" 
+          dataKey="High" 
+          stroke="#FF9800" 
+          strokeDasharray="5 5" 
+          strokeWidth={1.5} 
+          dot={false} 
+          name="Daily High"
+        />
+        <Line 
+          type="monotone" 
+          dataKey="Low" 
+          stroke="#2196F3" 
+          strokeDasharray="5 5" 
+          strokeWidth={1.5} 
+          dot={false} 
+          name="Daily Low"
+        />
+        <Line 
+          type="monotone" 
+          dataKey="Open" 
+          stroke="#9C27B0" 
+          strokeDasharray="5 5" 
+          strokeWidth={1.5} 
+          dot={false} 
+          name="Opening Price"
+        />
+      </LineChart>
     );
   };
 
@@ -261,17 +321,16 @@ const Summary = () => {
       <h2 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px' }}>Stock Performance Summary (Real-Time Data)</h2>
 
       {/* Company Selector and Time Range Buttons */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '15px' }}>
         
         {/* Company Selection Dropdown */}
-        <div className="company-selector">
-            <label htmlFor="company-select" style={{ marginRight: '10px', fontSize: '16px', fontWeight: 'bold' }}>Select Company:</label>
+        <div className="company-selector" style={{ flex: '1 1 auto', minWidth: '250px' }}>
+            <label htmlFor="company-select" style={{ marginRight: '10px', fontSize: '16px', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Select Company:</label>
             <select
             id="company-select"
             onChange={handleCompanyChange}
             value={selectedCompany ? selectedCompany.companyName : ''}
-            // Light Theme Styles
-            style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '16px', minWidth: '200px', backgroundColor: '#f5f5f5', color: '#333' }}
+            style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '16px', width: '100%', maxWidth: '400px', backgroundColor: '#f5f5f5', color: '#333' }}
             disabled={loading || error}
             >
             <option value="">-- Please choose a company --</option>
@@ -284,7 +343,7 @@ const Summary = () => {
         </div>
         
         {/* Time Range Selector Buttons */}
-        <div style={{ display: 'flex', gap: '5px' }}>
+        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {['1D', '5D', '1M', '6M', 'YTD', '1Y', '5Y'].map(range => (
             <button
               key={range}
@@ -292,15 +351,14 @@ const Summary = () => {
               style={{
                 padding: '6px 12px',
                 borderRadius: '5px',
-                // Active/Inactive Button Colors
                 border: timeRange === range ? '1px solid #4CAF50' : '1px solid #ccc',
                 backgroundColor: timeRange === range ? '#4CAF50' : '#f5f5f5',
                 color: timeRange === range ? '#ffffff' : '#333',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                // FAST Transition: 0s for instant change
                 transition: 'all 0s', 
-                fontSize: '14px'
+                fontSize: '14px',
+                minWidth: '50px'
               }}
             >
               {range}
@@ -309,11 +367,12 @@ const Summary = () => {
         </div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: '50px' }}>Loading summary...</div>}
-      {error && <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>Error: {error}</div>}
+      {loading && <div style={{ textAlign: 'center', padding: '50px', fontSize: '18px' }}>Loading summary...</div>}
+      {error && <div style={{ textAlign: 'center', padding: '50px', color: 'red', fontSize: '16px' }}>Error: {error}<br/><button onClick={() => window.location.reload()} style={{ marginTop: '10px', padding: '10px 20px', cursor: 'pointer' }}>Refresh Page</button></div>}
       {!loading && !error && (!selectedCompany || chartData.length === 0) ? (
         <div className="empty-component" style={{ textAlign: 'center', padding: '50px', border: '1px dashed #ccc', borderRadius: '5px', color: '#666' }}>
           <p>Please select a company to view its stock performance trend.</p>
+          {selectedCompany && chartData.length === 0 && <p style={{ marginTop: '10px', color: '#999' }}>Loading chart data...</p>}
         </div>
       ) : (
         <>
@@ -321,22 +380,21 @@ const Summary = () => {
           <div className="live-price-section" style={{ marginBottom: '20px', paddingLeft: '5px' }}>
             {(() => {
               const currentPrice = lastDataPoint.Close;
-              // Use the first data point's Open price as the baseline for 1D change
               const openingPrice = chartData.length > 0 ? chartData[0].Open : 0;
               const priceChange = currentPrice - openingPrice;
               const percentageChange = openingPrice !== 0 ? (priceChange / openingPrice) * 100 : 0;
               const isPositive = priceChange >= 0;
 
               if (typeof currentPrice !== 'number') {
-                return null; // Don't render if we don't have a price yet
+                return null;
               }
 
               return (
                 <>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937' }}>
+                  <div style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 'bold', color: '#1f2937' }}>
                     {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px', fontSize: '1.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px', fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)', flexWrap: 'wrap' }}>
                     <span style={{ color: isPositive ? '#16a34a' : '#dc2626', fontWeight: '500' }}>
                       {isPositive ? '+' : ''}{priceChange.toFixed(2)}
                     </span>
@@ -344,7 +402,7 @@ const Summary = () => {
                       ({isPositive ? '+' : ''}{percentageChange.toFixed(2)}%)
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '8px' }}>
+                  <div style={{ fontSize: 'clamp(0.7rem, 1.8vw, 0.8rem)', color: '#6b7280', marginTop: '8px' }}>
                     As of {format(new Date(), 'h:mm:ss a')} {new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'short' }).substring(3)}. Market Open.
                   </div>
                 </>
@@ -353,7 +411,7 @@ const Summary = () => {
           </div>
           {/* --- End Live Price Display --- */}
 
-          <h3 style={{ marginBottom: '15px', color: '#555', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h3 style={{ marginBottom: '15px', color: '#555', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', fontSize: 'clamp(1rem, 2.5vw, 1.2rem)' }}>
             {selectedCompany ? selectedCompany.companyName : '...'} | Showing {timeRange} Trend
             {timeRange === '1D' && (
               <span className="live-indicator">
@@ -362,33 +420,38 @@ const Summary = () => {
               </span>
             )}
           </h3>
-          <div style={{ width: '100%', height: 400, backgroundColor: '#ffffff', padding: '5px', borderRadius: '8px', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ width: '100%', height: '400px', minHeight: '400px', backgroundColor: '#ffffff', padding: '20px', border: '1px solid #000000', marginBottom: '20px' }}>
             <ResponsiveContainer width="100%" height="100%">
               {renderChart()}
             </ResponsiveContainer>
           </div>
           
           {/* Stock Info Bar */}
-          <div className="stock-info" style={{ display: 'flex', justifyContent: 'space-around', padding: '15px 0', borderTop: '1px solid #eee', marginTop: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
-                  <strong>Open:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Open ? lastDataPoint.Open.toFixed(2) : 'N/A'}
+          <div className="stock-info" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', padding: '15px', borderTop: '1px solid #eee', marginTop: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <div style={{ textAlign: 'center', padding: '10px', borderRight: '1px solid #eee' }}>
+                  <strong style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Open:</strong> <br /> 
+                  <span style={{ fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)' }}>{selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Open ? lastDataPoint.Open.toFixed(2) : 'N/A'}</span>
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
-                  <strong>High:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.High ? lastDataPoint.High.toFixed(2) : 'N/A'}
+              <div style={{ textAlign: 'center', padding: '10px', borderRight: '1px solid #eee' }}>
+                  <strong style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>High:</strong> <br /> 
+                  <span style={{ fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)' }}>{selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.High ? lastDataPoint.High.toFixed(2) : 'N/A'}</span>
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
-                  <strong>Low:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Low ? lastDataPoint.Low.toFixed(2) : 'N/A'}
+              <div style={{ textAlign: 'center', padding: '10px', borderRight: '1px solid #eee' }}>
+                  <strong style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Low:</strong> <br /> 
+                  <span style={{ fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)' }}>{selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Low ? lastDataPoint.Low.toFixed(2) : 'N/A'}</span>
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
-                  <strong>Close:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Close ? lastDataPoint.Close.toFixed(2) : 'N/A'}
+              <div style={{ textAlign: 'center', padding: '10px', borderRight: '1px solid #eee' }}>
+                  <strong style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Close:</strong> <br /> 
+                  <span style={{ fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)' }}>{selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Close ? lastDataPoint.Close.toFixed(2) : 'N/A'}</span>
               </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                  <strong>Volume:</strong> <br /> {lastDataPoint.Volume ? lastDataPoint.Volume.toLocaleString() : (selectedCompany ? selectedCompany.dailyPerformance.volume : 'N/A')}
+              <div style={{ textAlign: 'center', padding: '10px' }}>
+                  <strong style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>Volume:</strong> <br /> 
+                  <span style={{ fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)' }}>{lastDataPoint.Volume ? lastDataPoint.Volume.toLocaleString() : (selectedCompany ? selectedCompany.dailyPerformance.volume : 'N/A')}</span>
               </div>
           </div>
         </>
       )}
-      <style jsx>{`
+      <style>{`
         .live-indicator {
           display: inline-flex;
           align-items: center;

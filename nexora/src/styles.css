@@ -9,34 +9,39 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background-color: #f5f7fb; /* softer light background */
-  color: #1f2937; /* slate-800 */
+  background-color: #f5f7fb;
+  color: #1f2937;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .dashboard {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  /* If you want the *entire dashboard* content to be centered and have a max width */
-  /* max-width: 1521px; */
-  /* margin: 0 auto; */
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.75rem 2rem;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 1521px; 
-  max-width: 100%;     /* ensures it doesn’t overflow on smaller screens */
-  /* margin: 0 auto; -- If you want the header itself to be centered within a larger body */
+  width: 100%;
+  max-width: 100%;
+  min-height: 80px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Brand block: logo + separator + text */
@@ -44,73 +49,95 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: nowrap;
 }
 
 .brand-logo {
-  height: 48px;
+  height: 45px;
   width: auto;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .brand-sep {
   color: #cfcfcf;
   font-weight: 600;
-  margin-left: 4px;
-  margin-right: 6px;
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .brand-text {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 }
 
 .title {
   font-weight: 700;
-  font-size: 1.8rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin: 0;
+  color: #1f2937;
 }
 
 .tagline {
   font-style: italic;
-  font-size: 1rem;
-  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  color: #6b7280;
+  margin: 0;
 }
 
 /* Sign-out button */
 .sign-out-btn {
-  margin: 1rem 1.5rem;
-  padding: 0.75rem;
-  background-color: #ff4d4f; /* red */
-  color: #fff; /* white text */
+  margin: 0;
+  padding: 0.65rem 1.5rem;
+  background-color: #ff4d4f;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
 }
 
 .sign-out-btn:hover {
-  background-color: #e04344; /* slightly darker red on hover */
+  background-color: #e04344;
+  box-shadow: 0 4px 8px rgba(255, 77, 79, 0.3);
+  transform: translateY(-1px);
+}
+
+.sign-out-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(255, 77, 79, 0.2);
 }
 
 /* Header right dropdown */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .header-right .dropdown {
-  padding: 0.5rem 2rem 0.5rem 0.5rem; /* space for arrow */
+  padding: 0.5rem 2rem 0.5rem 0.5rem;
   border-radius: 4px;
   border: 1px solid #ddd;
   background-color: #fff;
   font-family: 'DM Sans', sans-serif;
   font-size: 1rem;
-  color: #000; /* black text */
+  color: #000;
   cursor: pointer;
-
-  /* Remove default arrow */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
-  /* Custom black arrow */
   background-image: url("data:image/svg+xml;utf8,<svg fill='%23000' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
@@ -118,7 +145,7 @@ body {
 }
 
 .header-right .dropdown option {
-  color: #000; /* black text for options */
+  color: #000;
   background-color: #fff;
 }
 
@@ -126,18 +153,35 @@ body {
   display: flex;
   flex: 1;
   width: 100%;
-  max-width: 1640px;      /* overall app content width */
-  margin: 0 auto;         /* centers the content horizontally */
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  position: relative;
 }
-
 
 .menu {
   width: 250px;
+  min-width: 250px;
   background-color: #fff;
   padding: 1.5rem 0;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 100;
+}
+
+/* Desktop: hamburger is not clickable */
+@media (min-width: 769px) {
+  .menu-header {
+    cursor: default;
+  }
+  
+  .hamburger-menu {
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 .menu-header {
@@ -146,6 +190,13 @@ body {
   padding: 0 1.5rem 1rem;
   border-bottom: 1px solid #eee;
   margin-bottom: 1rem;
+  user-select: none;
+}
+
+.menu-header span {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .hamburger-menu {
@@ -155,6 +206,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   margin-right: 0.75rem;
+  cursor: pointer;
 }
 
 .hamburger-menu span {
@@ -162,6 +214,20 @@ body {
   width: 100%;
   background-color: #333;
   border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Hamburger animation when menu is open */
+.menu.open .hamburger-menu span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu.open .hamburger-menu span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu.open .hamburger-menu span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
 }
 
 .menu-items {
@@ -185,11 +251,45 @@ body {
   font-weight: 500;
 }
 
+.menu-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  margin-top: auto;
+}
+
+.menu-footer .sign-out-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
+}
+
+.menu-footer .sign-out-btn:hover {
+  background-color: #e04344;
+  box-shadow: 0 4px 8px rgba(255, 77, 79, 0.3);
+  transform: translateY(-1px);
+}
+
+.menu-footer .sign-out-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(255, 77, 79, 0.2);
+}
+
 .main-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  overflow-x: hidden;
   max-width: 100%;
+  width: 100%;
 }
 
 /* Section containers */
@@ -203,13 +303,14 @@ body {
   box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
   margin-bottom: 2rem;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
-
 
 h2 {
   font-size: 1.4rem;
   margin-bottom: 1rem;
-  color: #0f172a; /* slate-900 */
+  color: #0f172a;
 }
 
 .section-subtle-divider {
@@ -249,7 +350,7 @@ h2 {
 
 .filter-group select {
   width: 100%;
-  padding: 0.5rem 2rem 0.5rem 0.5rem; /* extra right padding for arrow */
+  padding: 0.5rem 2rem 0.5rem 0.5rem;
   border-radius: 4px;
   border: 1px solid #ddd;
   background-color: #fff;
@@ -257,13 +358,9 @@ h2 {
   font-size: 1rem;
   color: #333;
   cursor: pointer;
-
-  /* Remove default arrow */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
-  /* Custom arrow (dark gray) */
   background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
@@ -276,10 +373,9 @@ h2 {
 }
 
 /* Tables */
-/* This table-container is for the specific table within the financial-table-wrapper */
 .table-container {
   width: 100%;
-  overflow-x: auto; /* Allow horizontal scroll, but not vertical */
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -287,7 +383,7 @@ h2 {
 }
 
 .table-container table {
-  min-width: 1100px; /* ensures wide layout; can scroll horizontally */
+  min-width: 1100px;
   width: 100%;
   border-collapse: collapse;
 }
@@ -299,16 +395,15 @@ th, td {
 }
 
 th {
-  background-color: #f3f4f6; /* gray-100 */
+  background-color: #f3f4f6;
   font-weight: 600;
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
-/* Specific styling for the nested header rows in Financial table */
 .table-container table thead tr:first-child th {
-  background-color: #eef2ff; /* indigo-50 */
+  background-color: #eef2ff;
   text-align: center;
   font-weight: 600;
   border-bottom: 1px solid #dbeafe;
@@ -317,10 +412,9 @@ th {
 
 .table-container table thead tr:nth-child(2) th {
   background-color: #f3f4f6;
-  top: 48px; /* align below first header row */
+  top: 48px;
   border-bottom: 1px solid #e5e7eb;
 }
-
 
 tr:hover {
   background-color: #fafafa;
@@ -329,16 +423,18 @@ tr:hover {
 .action-items {
   display: flex;
   align-items: center;
-  gap: 15px; /* Space between search bar and button */
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 .search-bar {
   position: relative;
   display: flex;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.15); /* semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.15);
   border-radius: 5px;
   padding: 5px 10px;
+  min-width: 200px;
 }
 
 .search-bar input {
@@ -348,7 +444,7 @@ tr:hover {
   padding: 8px;
   font-size: 14px;
   outline: none;
-  color: #000; /* text color */
+  color: #000;
 }
 
 .search-icon {
@@ -357,9 +453,8 @@ tr:hover {
   font-size: 16px;
 }
 
-
 .download-csv-btn {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -367,6 +462,7 @@ tr:hover {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s ease;
+  white-space: nowrap;
 }
 
 .download-csv-btn:hover {
@@ -376,36 +472,12 @@ tr:hover {
 .actions-right {
   display: flex;
   align-items: center;
-  gap: 15px; /* Space between search bar and button */
-}
-
-.search-bar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.15); /* semi-transparent background */
-  border-radius: 5px;
-  padding: 5px 10px;
-}
-
-.search-bar input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  padding: 8px;
-  font-size: 14px;
-  outline: none;
-  color: #000; /* text color */
-}
-
-.search-icon {
-  margin-left: 5px;
-  color: #555;
-  font-size: 16px;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 .download-csv-button {
-  background-color: #28a745; /* Green color for download */
+  background-color: #28a745;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -413,6 +485,7 @@ tr:hover {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
 .download-csv-button:hover {
@@ -432,6 +505,7 @@ tr:hover {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .company-summary__controls label {
@@ -441,6 +515,7 @@ tr:hover {
 
 .company-summary__input {
   flex: 0 1 360px;
+  min-width: 200px;
   padding: 0.6rem 0.8rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -465,8 +540,6 @@ tr:hover {
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
-
-/* globe removed */
 
 .company-summary__pie {
   display: grid;
@@ -510,12 +583,573 @@ tr:hover {
   font-variant-numeric: tabular-nums;
 }
 
+/* ============================================
+   RESPONSIVE STYLES - MOBILE & TABLET
+   ============================================ */
+
+/* Tablet and below */
 @media (max-width: 1024px) {
+  .header {
+    padding: 0.75rem 1.5rem;
+    min-height: 70px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+  }
+
+  .brand-logo {
+    height: 40px;
+  }
+
+  .brand-sep {
+    font-size: 1.3rem;
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+
   .company-summary__grid {
     grid-template-columns: 1fr;
   }
+
   .company-summary__pie {
     grid-template-columns: 1fr;
     justify-items: center;
+  }
+
+  .company-summary__legend {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    min-height: auto;
+    gap: 0.75rem;
+  }
+
+  .header-left {
+    flex: 1 1 auto;
+    min-width: 200px;
+  }
+
+  .header-right {
+    flex: 0 0 auto;
+  }
+
+  .brand {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand-logo {
+    height: 38px;
+  }
+
+  .brand-sep {
+    font-size: 1.2rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .tagline {
+    font-size: 0.8rem;
+  }
+
+  .sign-out-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dashboard-content {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: 100%;
+    min-width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0;
+  }
+
+  .menu-header {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    transition: background-color 0.2s ease;
+  }
+
+  .menu-header:hover {
+    background-color: #e9ecef;
+  }
+
+  .menu-header:active {
+    background-color: #dee2e6;
+  }
+
+  .menu-items {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #fff;
+    padding: 0;
+  }
+
+  .menu.open .menu-items {
+    max-height: 500px;
+    padding: 0.5rem 0;
+  }
+
+  .menu-items li {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .menu-footer {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    background-color: #fff;
+  }
+
+  .menu.open .menu-footer {
+    display: block;
+  }
+
+  .menu:not(.open) .menu-footer {
+    display: none;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .summary-container,
+  .ntp-container,
+  .technographics-container,
+  .financial-section-container {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .action-items,
+  .actions-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-bar {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .download-csv-btn,
+  .download-csv-button {
+    width: 100%;
+  }
+
+  .company-summary__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .company-summary__input {
+    width: 100%;
+    flex: 1;
+  }
+
+  .company-summary__pie-graphic {
+    width: 150px;
+    height: 150px;
+  }
+
+  .table-container {
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .header {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .brand {
+    gap: 6px;
+  }
+
+  .brand-logo {
+    height: 32px;
+  }
+
+  .brand-sep {
+    font-size: 1rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .tagline {
+    font-size: 0.7rem;
+  }
+
+  .sign-out-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .main-content {
+    padding: 0.75rem;
+  }
+
+  .summary-container,
+  .ntp-container,
+  .technographics-container,
+  .financial-section-container {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .company-summary__pie-graphic {
+    width: 120px;
+    height: 120px;
+  }
+
+  .sign-out-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* ============================================
+   CHART RESPONSIVE STYLES
+   ============================================ */
+
+.recharts-wrapper {
+  font-size: 12px !important;
+}
+
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    font-size: 10px !important;
+  }
+
+  .recharts-cartesian-axis-tick-value {
+    font-size: 10px !important;
+  }
+
+  .recharts-legend-wrapper {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .recharts-wrapper {
+    font-size: 9px !important;
+  }
+
+  .recharts-cartesian-axis-tick-value {
+    font-size: 9px !important;
+  }
+
+  .recharts-legend-wrapper {
+    font-size: 10px !important;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES FOR RESPONSIVE DESIGN
+   ============================================ */
+
+.responsive-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Prevent horizontal scroll on all elements */
+* {
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure containers don't overflow */
+.container,
+.wrapper,
+.content {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   TABLE COMPONENTS RESPONSIVE STYLES
+   ============================================ */
+
+.buyer-group-section-container,
+.growth-section-container,
+.mutual-fund-section-container {
+  background: linear-gradient(180deg, #ffffff, #fafbff);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-controls h2 {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .buyer-group-section-container,
+  .growth-section-container,
+  .mutual-fund-section-container {
+    padding: 1rem;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-controls h2 {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-items {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .download-csv-btn {
+    width: 100%;
+  }
+
+  .table-container {
+    font-size: 0.85rem;
+  }
+
+  .table-container th,
+  .table-container td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .buyer-group-section-container,
+  .growth-section-container,
+  .mutual-fund-section-container {
+    padding: 0.75rem;
+  }
+
+  .table-container {
+    font-size: 0.75rem;
+  }
+
+  .table-container th,
+  .table-container td {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================
+   MARTECH COMPONENTS RESPONSIVE STYLES
+   ============================================ */
+
+.ntp-container,
+.intent-container,
+.technographics-container {
+  background: linear-gradient(180deg, #ffffff, #fafbff);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .ntp-container,
+  .intent-container,
+  .technographics-container {
+    padding: 1rem;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .ntp-container,
+  .intent-container,
+  .technographics-container {
+    padding: 0.75rem;
+  }
+}
+
+/* Modal responsive styles */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  .modal-overlay {
+    padding: 1rem !important;
+  }
+}
+
+/* ============================================
+   STOCK PERFORMANCE COMPONENT STYLES
+   ============================================ */
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.performance-type-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.performance-type-filters button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  color: #333;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 80px;
+  transition: all 0.2s ease;
+}
+
+.performance-type-filters button.active {
+  background-color: #1e90ff;
+  color: white;
+  border-color: #1e90ff;
+}
+
+.performance-type-filters button:hover {
+  background-color: #e9ecef;
+}
+
+.performance-type-filters button.active:hover {
+  background-color: #1c7ed6;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-header th {
+  position: sticky;
+  top: 0;
+}
+
+@media (max-width: 768px) {
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-items {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .search-bar {
+    flex: 1;
+  }
+  
+  .download-csv-btn {
+    flex: 1;
   }
 }

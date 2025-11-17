@@ -362,7 +362,8 @@ const SankeyGraph = ({ data }) => {
             height: `${CHART_HEIGHT}px`,
             width: '100%',
             padding: '20px 10px',
-            overflow: 'hidden',
+            overflow: 'auto',
+            minWidth: '100%',
         },
         svgOverlay: {
             position: 'absolute',
@@ -724,9 +725,11 @@ const Summary = () => {
             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
             padding: '20px',
             backgroundColor: '#f4f4f9',
+            maxWidth: '100%',
+            overflowX: 'hidden',
         },
         title: {
-            fontSize: '2rem',
+            fontSize: 'clamp(1.5rem, 4vw, 2rem)',
             fontWeight: '700',
             color: '#1f2937',
             marginBottom: '10px',
@@ -738,7 +741,7 @@ const Summary = () => {
         },
         grid2up: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 500px), 1fr))',
             gap: '20px',
             marginBottom: '20px',
         },
@@ -748,9 +751,11 @@ const Summary = () => {
             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4 rgb(0 0 0 / 0.1)',
             backgroundColor: 'white',
             border: '1px solid #e5e7eb',
+            maxWidth: '100%',
+            overflow: 'hidden',
         },
         panelTitle: {
-            fontSize: '1.25rem',
+            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
             fontWeight: '600',
             color: '#374151',
             marginBottom: '15px',
@@ -763,7 +768,8 @@ const Summary = () => {
             justifyContent: 'flex-start',
             gap: '30px',
             padding: '10px',
-            height: '300px',
+            minHeight: '300px',
+            flexWrap: 'wrap',
         },
         pieContainer: {
             width: `${SVG_SIZE}px`,
@@ -773,6 +779,7 @@ const Summary = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            margin: '0 auto',
         },
         pieGraphic: {
             width: `${PIE_RADIUS * 2}px`,
@@ -798,7 +805,8 @@ const Summary = () => {
             listStyle: 'none',
             padding: '0',
             margin: '0',
-            flexGrow: 1,
+            flex: '1 1 200px',
+            minWidth: '200px',
             maxHeight: '300px',
             overflowY: 'auto',
             paddingLeft: '10px',
@@ -836,20 +844,50 @@ const Summary = () => {
 
     return (
         <div style={styles.overallSummary}>
+            <style>{`
+                @media (max-width: 768px) {
+                    .summary-pie-responsive {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        height: auto !important;
+                        padding: 5px !important;
+                    }
+                    .summary-legend-responsive {
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        padding-left: 0 !important;
+                        margin-top: 20px;
+                    }
+                    .sankey-container-responsive {
+                        overflow-x: auto !important;
+                        -webkit-overflow-scrolling: touch;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .pie-container-responsive {
+                        transform: scale(0.7);
+                    }
+                    .summary-pie-responsive {
+                        padding: 0 !important;
+                    }
+                }
+            `}</style>
             <h2 style={styles.title}>Technology Summary</h2>
             <div style={styles.divider} />
 
             <div style={styles.grid2up}>
                 <div style={styles.summaryPanel}>
                     <div style={styles.panelTitle}>Technology Stack Breakdown</div>
-                    <SankeyGraph data={overallSankeyData} />
+                    <div className="sankey-container-responsive">
+                        <SankeyGraph data={overallSankeyData} />
+                    </div>
                 </div>
 
                 <div style={styles.summaryPanel}>
                     <div style={styles.panelTitle}>Industry Wise Distribution</div>
-                    <div style={styles.summaryPie}>
+                    <div style={styles.summaryPie} className="summary-pie-responsive">
                         {/* PIE CHART SECTION */}
-                        <div style={styles.pieContainer}>
+                        <div style={styles.pieContainer} className="pie-container-responsive">
                             {/* SVG for Annotations (Lines and Values) */}
                             <PieAnnotations data={overallIndustryPieData} total={totalValue} hoveredLabel={hoveredPieData?.label} />
 
@@ -863,7 +901,7 @@ const Summary = () => {
                         </div>
 
                         {/* LEGEND SECTION */}
-                        <ul style={styles.summaryLegend}>
+                        <ul style={styles.summaryLegend} className="summary-legend-responsive">
                             {overallIndustryPieData.map((item, index) => {
                                 const isHovered = item.label === hoveredPieData?.label;
                                 return (
@@ -914,30 +952,30 @@ const Summary = () => {
                 <div style={styles.summaryPanel}>
                     <div style={styles.panelTitle}>Intent distribution</div>
                     {/* Intent distribution table (counts based on provided image) */}
-                    <div style={{ padding: '10px' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <div style={{ padding: '10px', overflowX: 'auto' }}>
+                        <table style={{ width: '100%', minWidth: '250px', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
                                 <tr style={{ background: '#bfdbfe' }}>
-                                    <th style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Intent Status</th>
-                                    <th style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Total Accounts</th>
+                                    <th style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>Intent Status</th>
+                                    <th style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>Total Accounts</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Medium</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>29</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>Medium</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>29</td>
                                 </tr>
                                 <tr style={{ background: '#f3f4f6' }}>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Low</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>26</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>Low</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>26</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>High</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>15</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>High</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>15</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>Total</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>70</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontWeight: 700, fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>Total</td>
+                                    <td style={{ padding: 'clamp(8px, 2vw, 10px)', border: '1px solid #e5e7eb', fontWeight: 700, fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>70</td>
                                 </tr>
                             </tbody>
                         </table>

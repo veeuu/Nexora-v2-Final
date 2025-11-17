@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:nexora\" \"npm run dev:backend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:nexora:delayed\"",
     "dev:nexora": "vite --host",
+    "dev:nexora:delayed": "node wait-for-backend.js && npm run dev:nexora",
     "dev:backend": "cd ../backend && node server.js",
     "build": "vite build",
     "lint": "eslint .",
