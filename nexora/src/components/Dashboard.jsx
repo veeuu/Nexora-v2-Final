@@ -8,7 +8,7 @@ import MartechTechnographics from './martech/Technographics';
 import MarketSummary from './market/Summary';
 // import MarketNTP from './market/NTP'; // Commented out as requested
 import MarketFinancial from './market/Financial';
-import StockPerformance from './market/StockPerformanceold';
+import StockPerformance from './market/StockPerformance';
 import BuyerGroup from './market/BuyerGroup';
 import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
