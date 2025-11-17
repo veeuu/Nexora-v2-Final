@@ -14,7 +14,7 @@ import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
 
 const Dashboard = ({ onLogout }) => {
-  const [activeView, setActiveView] = useState('Market');
+  const [activeView, setActiveView] = useState('Martech');
   const [activeSection, setActiveSection] = useState('Summary');
 
   const handleDropdownChange = (value) => {
@@ -70,12 +70,13 @@ const Dashboard = ({ onLogout }) => {
 
   return (
     <div className="dashboard">
-  <Header onDropdownChange={handleDropdownChange} onLogout={onLogout} />
+      <Header onDropdownChange={handleDropdownChange} />
       <div className="dashboard-content">
         <Menu 
           activeSection={activeSection}
           onMenuClick={handleMenuClick}
           menuItems={getMenuItems()}
+          onLogout={onLogout}
         />
         <main className="main-content">
           {renderActiveSection()}

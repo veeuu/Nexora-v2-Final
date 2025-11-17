@@ -1,28 +1,61 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 
-const Menu = ({ activeSection, onMenuClick, menuItems }) => {
+const Menu = ({ activeSection, onMenuClick, menuItems, onLogout }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setIsOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const toggleMenu = () => {
+    if (isMobile) {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  const handleMenuItemClick = (item) => {
+    onMenuClick(item);
+    if (isMobile) {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <nav className="menu">
-      <div className="menu-header">
-        <div className="hamburger-menu">
+      <div className="menu-header" onClick={toggleMenu}>
+        <div className={`hamburger-menu ${isOpen ? 'active' : ''}`}>
           <span></span>
           <span></span>
           <span></span>
         </div>
         <span>Menu</span>
       </div>
-      <ul className="menu-items">
+      <ul className={`menu-items ${isOpen ? 'open' : ''}`}>
         {menuItems.map((item) => (
           <li 
             key={item} 
             className={activeSection === item ? 'active' : ''}
-            onClick={() => onMenuClick(item)}
+            onClick={() => handleMenuItemClick(item)}
           >
             {item}
           </li>
         ))}
       </ul>
-      {/* <button className="sign-out-btn">Sign Out</button> */}
+      <div className={`menu-footer ${isOpen ? 'open' : ''}`}>
+        <button className="sign-out-btn" onClick={() => onLogout && onLogout()}>
+          Sign Out
+        </button>
+      </div>
     </nav>
   );
 };

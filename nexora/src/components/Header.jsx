@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import logo from '../assets/Proplus Data Logo - Horizontal Transparent (1).png';
 
-const Header = ({ onDropdownChange, onLogout }) => {
-  const [selectedOption, setSelectedOption] = useState('Martech');
+const Header = ({ onDropdownChange }) => {
+  const [selectedOption, setSelectedOption] = useState('Market');
 
   const handleDropdownChange = (e) => {
     const value = e.target.value;
@@ -22,7 +22,7 @@ const Header = ({ onDropdownChange, onLogout }) => {
           </div>
         </div>
       </div>
-      <div className="header-right" style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+      <div className="header-right">
         {/* <select 
           className="dropdown" 
           value={selectedOption} 
@@ -31,7 +31,6 @@ const Header = ({ onDropdownChange, onLogout }) => {
           <option value="Martech">Martech</option>
           <option value="Market">Market</option>
         </select> */}
-        <button className="sign-out-btn" onClick={() => onLogout && onLogout()}>Sign Out</button>
       </div>
     </header>
   );

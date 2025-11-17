@@ -184,14 +184,14 @@ const aggregateWorldMapData = (data) => {
     return Object.values(continentMap);
 };
 
-const CHART_HEIGHT = 420;
+const CHART_HEIGHT = 380;
 const COLUMN_X = {
-    Technologies: 100,
-    Category: 220,
-    Products: 380,
+    Technologies: 80,
+    Category: 200,
+    Products: 340,
 };
-const NODE_WIDTH = 150;
-const NODE_VERTICAL_SPACING = 35;
+const NODE_WIDTH = 130;
+const NODE_VERTICAL_SPACING = 32;
 
 const LINK_STROKE_WIDTH = 2;
 
@@ -312,14 +312,14 @@ const SankeyGraph = ({ data }) => {
         let x;
 
         if (column === 'Technologies') {
-            x = COLUMN_X.Technologies - 50;
+            x = COLUMN_X.Technologies - 40;
         } else if (column === 'Category') {
             x = COLUMN_X.Category;
         } else {
             x = COLUMN_X.Products;
         }
 
-        const barWidth = column === 'Technologies' ? '100px' : `${NODE_WIDTH}px`;
+        const barWidth = column === 'Technologies' ? '80px' : `${NODE_WIDTH}px`;;
 
         return (
             <div
@@ -361,7 +361,8 @@ const SankeyGraph = ({ data }) => {
             position: 'relative',
             height: `${CHART_HEIGHT}px`,
             width: '100%',
-            padding: '20px 10px',
+            maxWidth: '100%',
+            padding: '20px 5px',
             overflow: 'hidden',
         },
         svgOverlay: {

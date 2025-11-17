@@ -261,17 +261,15 @@ const Summary = () => {
       <h2 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px' }}>Stock Performance Summary (Real-Time Data)</h2>
 
       {/* Company Selector and Time Range Buttons */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '15px' }}>
         
         {/* Company Selection Dropdown */}
         <div className="company-selector">
-            <label htmlFor="company-select" style={{ marginRight: '10px', fontSize: '16px', fontWeight: 'bold' }}>Select Company:</label>
+            <label htmlFor="company-select">Select Company:</label>
             <select
             id="company-select"
             onChange={handleCompanyChange}
             value={selectedCompany ? selectedCompany.companyName : ''}
-            // Light Theme Styles
-            style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '16px', minWidth: '200px', backgroundColor: '#f5f5f5', color: '#333' }}
             disabled={loading || error}
             >
             <option value="">-- Please choose a company --</option>
@@ -284,23 +282,16 @@ const Summary = () => {
         </div>
         
         {/* Time Range Selector Buttons */}
-        <div style={{ display: 'flex', gap: '5px' }}>
+        <div className="time-range-buttons">
           {['1D', '5D', '1M', '6M', 'YTD', '1Y', '5Y'].map(range => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
+              className={timeRange === range ? 'active' : ''}
               style={{
-                padding: '6px 12px',
-                borderRadius: '5px',
-                // Active/Inactive Button Colors
                 border: timeRange === range ? '1px solid #4CAF50' : '1px solid #ccc',
                 backgroundColor: timeRange === range ? '#4CAF50' : '#f5f5f5',
                 color: timeRange === range ? '#ffffff' : '#333',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                // FAST Transition: 0s for instant change
-                transition: 'all 0s', 
-                fontSize: '14px'
               }}
             >
               {range}
@@ -369,20 +360,20 @@ const Summary = () => {
           </div>
           
           {/* Stock Info Bar */}
-          <div className="stock-info" style={{ display: 'flex', justifyContent: 'space-around', padding: '15px 0', borderTop: '1px solid #eee', marginTop: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
+          <div className="stock-info">
+              <div>
                   <strong>Open:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Open ? lastDataPoint.Open.toFixed(2) : 'N/A'}
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
+              <div>
                   <strong>High:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.High ? lastDataPoint.High.toFixed(2) : 'N/A'}
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
+              <div>
                   <strong>Low:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Low ? lastDataPoint.Low.toFixed(2) : 'N/A'}
               </div>
-              <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #eee' }}>
+              <div>
                   <strong>Close:</strong> <br /> {selectedCompany ? selectedCompany.currency : ''} {lastDataPoint.Close ? lastDataPoint.Close.toFixed(2) : 'N/A'}
               </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
+              <div>
                   <strong>Volume:</strong> <br /> {lastDataPoint.Volume ? lastDataPoint.Volume.toLocaleString() : (selectedCompany ? selectedCompany.dailyPerformance.volume : 'N/A')}
               </div>
           </div>
