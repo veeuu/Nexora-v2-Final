@@ -44,7 +44,7 @@ const StockPerformance = () => {
 
   const handleDownloadCSV = () => {
     const headers = [
-      'ID','Company Name', 'Domain', 'Industry', 'Performance Type',
+      'ID', 'Company Name', 'Domain', 'Industry', 'Performance Type',
       'Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Adj. Close', 'Dividends'
     ];
 
@@ -91,20 +91,20 @@ const StockPerformance = () => {
     });
 
     const matchesFilters =
-      (filters.stockPerformance === '' || 
-        (filters.stockPerformance === 'High' && row.revenueGrowth && parseFloat(row.revenueGrowth) > 10) || 
-        (filters.stockPerformance === 'Medium' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 10 && parseFloat(row.revenueGrowth) > 5) || 
+      (filters.stockPerformance === '' ||
+        (filters.stockPerformance === 'High' && row.revenueGrowth && parseFloat(row.revenueGrowth) > 10) ||
+        (filters.stockPerformance === 'Medium' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 10 && parseFloat(row.revenueGrowth) > 5) ||
         (filters.stockPerformance === 'Low' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 5)) &&
-      (filters.buyerHolder === '' || 
-        (filters.buyerHolder === 'Institutional' && row.marketCap && parseFloat(row.marketCap) > 10) || 
+      (filters.buyerHolder === '' ||
+        (filters.buyerHolder === 'Institutional' && row.marketCap && parseFloat(row.marketCap) > 10) ||
         (filters.buyerHolder === 'Retail' && row.marketCap && parseFloat(row.marketCap) <= 10)) &&
-      (filters.mutualFundHolders === '' || 
-        (filters.mutualFundHolders === 'High' && row.marketCap && parseFloat(row.marketCap) > 20) || 
-        (filters.mutualFundHolders === 'Medium' && row.marketCap && parseFloat(row.marketCap) <= 20 && parseFloat(row.marketCap) > 5) || 
+      (filters.mutualFundHolders === '' ||
+        (filters.mutualFundHolders === 'High' && row.marketCap && parseFloat(row.marketCap) > 20) ||
+        (filters.mutualFundHolders === 'Medium' && row.marketCap && parseFloat(row.marketCap) <= 20 && parseFloat(row.marketCap) > 5) ||
         (filters.mutualFundHolders === 'Low' && row.marketCap && parseFloat(row.marketCap) <= 5)) &&
-      (filters.growth === '' || 
-        (filters.growth === 'High' && row.profitGrowth && parseFloat(row.profitGrowth) > 15) || 
-        (filters.growth === 'Medium' && row.profitGrowth && parseFloat(row.profitGrowth) <= 15 && parseFloat(row.profitGrowth) > 8) || 
+      (filters.growth === '' ||
+        (filters.growth === 'High' && row.profitGrowth && parseFloat(row.profitGrowth) > 15) ||
+        (filters.growth === 'Medium' && row.profitGrowth && parseFloat(row.profitGrowth) <= 15 && parseFloat(row.profitGrowth) > 8) ||
         (filters.growth === 'Low' && row.profitGrowth && parseFloat(row.profitGrowth) <= 8));
 
     return matchesPerformanceType && matchesSearchTerm && matchesFilters;
@@ -148,12 +148,12 @@ const StockPerformance = () => {
           ))}
         </div>
       </div>
-      
+
       <div className="section-subtle-divider" />
       <div className="filters">
         {/* same filters */}
       </div>
-      
+
       <div className="table-container" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table style={{ borderCollapse: 'collapse', width: '100%' }}>
           <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
@@ -224,7 +224,7 @@ const StockPerformance = () => {
           border-color: #1e90ff;
         }
       `}</style>
-       <style jsx>{`
+      <style jsx>{`
         .table-container {
           max-height: 400px;
           overflow-x: auto;

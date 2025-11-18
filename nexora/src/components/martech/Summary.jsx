@@ -636,7 +636,7 @@ const Summary = () => {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [selectedIndustries, setSelectedIndustries] = useState([]);
     const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
-    const [intentCounts, setIntentCounts] = useState({ High: 0, 'High-Medium': 0, Medium: 0, Low: 0, Total: 0 });
+    const [intentCounts, setIntentCounts] = useState({ High: 0, 'High-Medium': 0, Medium: 0, Low: 0, 'Green Field Account': 0, Total: 0 });
 
     // Fetch technographics data and update context
     useEffect(() => {
@@ -722,13 +722,14 @@ const Summary = () => {
                 const data = await response.json();
 
                 // Calculate intent counts
-                const counts = { High: 0, 'High-Medium': 0, Medium: 0, Low: 0 };
+                const counts = { High: 0, 'High-Medium': 0, Medium: 0, Low: 0, 'Green Field Account': 0 };
                 data.forEach(item => {
                     const status = item.intentStatus;
                     if (status === 'High') counts.High++;
                     else if (status === 'High-Medium') counts['High-Medium']++;
                     else if (status === 'Medium') counts.Medium++;
                     else if (status === 'Low') counts.Low++;
+                    else if (status === 'Green Field Account') counts['Green Field Account']++;
                 });
                 counts.Total = data.length;
                 setIntentCounts(counts);
@@ -1406,6 +1407,10 @@ const Summary = () => {
                                 <tr>
                                     <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Low</td>
                                     <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Low}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Green Field Account</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts['Green Field Account']}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Total</td>
