@@ -431,19 +431,10 @@ const HeatMap = () => {
         }
     }, [availableRegions, country]);
 
-    // Function to calculate color based on value (0-100 scale)
+    // Function to return constant color
     const getColor = (value) => {
-        // Darker color for higher value, lighter for lower (Light Blue to Dark Blue gradient)
-        const maxR = 29, maxG = 78, maxB = 216; // Dark Blue: #1D4ED8
-        const minR = 224, minG = 242, minB = 254; // Light Blue: #E0F2FE
-
-        const scale = value / 100;
-
-        const r = Math.floor(minR + (maxR - minR) * scale);
-        const g = Math.floor(minG + (maxG - minG) * scale);
-        const b = Math.floor(minB + (maxB - minB) * scale);
-
-        return `rgb(${r}, ${g}, ${b})`;
+        // Use constant blue color for all values
+        return 'rgb(59, 130, 246)';
     };
 
     // Use only real data from Technographics
@@ -451,24 +442,41 @@ const HeatMap = () => {
     const regions = availableRegions;
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6 w-full">
+        <div className="bg-white rounded-xl shadow-lg p-6 w-full" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif' }}>
 
             {/* Region Dropdown */}
-            <div className="mb-6">
-                <label htmlFor="country-select" className="block text-sm font-medium text-gray-700 mb-1">
-                    Select Region :
+            <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <label htmlFor="country-select" style={{ fontSize: '14px', fontWeight: '500', color: '#374151', minWidth: 'fit-content' }}>
+                    Select Region:
                 </label>
                 <select
                     id="country-select"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     style={{
-                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                        flex: '1',
+                        padding: '8px 32px 8px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        backgroundColor: 'white',
+                        fontSize: '14px',
+                        color: '#1f2937',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        transition: 'all 0.2s ease',
+                        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 1rem center',
+                        backgroundPosition: 'right 10px center',
                         WebkitAppearance: 'none',
                         appearance: 'none'
+                    }}
+                    onFocus={(e) => {
+                        e.target.style.borderColor = '#3b82f6';
+                        e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                        e.target.style.borderColor = '#d1d5db';
+                        e.target.style.boxShadow = 'none';
                     }}
                     disabled={regions.length === 0}
                 >
@@ -488,25 +496,27 @@ const HeatMap = () => {
             {countryData ? (
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-3">
-                        {Object.entries(countryData).map(([tech, value]) => {
-                            // Blue gradient color: lighter at low %, darker at high %
-                            const color = getColor(value);
+                        {Object.entries(countryData)
+                            .sort(([, valueA], [, valueB]) => valueB - valueA) // Sort by value descending (high to low)
+                            .map(([tech, value]) => {
+                                // Constant blue color
+                                const color = getColor(value);
 
-                            // text color for percentage on right: keep dark to be readable
-                            const pctStyle = { fontWeight: 700, color: '#0f172a' };
+                                // text color for percentage on right: keep dark to be readable
+                                const pctStyle = { fontWeight: 700, color: '#0f172a' };
 
-                            return (
-                                <div key={tech} className="p-2 rounded-md transition-all duration-150" title={`${tech}: ${value}% adoption`}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ fontWeight: 600, color: '#0f172a' }}>{tech}</div>
-                                        <div style={pctStyle}>{value}%</div>
+                                return (
+                                    <div key={tech} className="p-2 rounded-md transition-all duration-150" title={`${tech}: ${value}% adoption`}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div style={{ fontWeight: 600, color: '#0f172a' }}>{tech}</div>
+                                            <div style={pctStyle}>{value}%</div>
+                                        </div>
+                                        <div style={{ height: '10px', width: '100%', backgroundColor: '#e6f0ff', borderRadius: 6, marginTop: 8, overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${value}%`, backgroundColor: color, transition: 'width 0.4s ease' }} />
+                                        </div>
                                     </div>
-                                    <div style={{ height: '10px', width: '100%', backgroundColor: '#e6f0ff', borderRadius: 6, marginTop: 8, overflow: 'hidden' }}>
-                                        <div style={{ height: '100%', width: `${value}%`, backgroundColor: color, transition: 'width 0.4s ease' }} />
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
                     </div>
                 </div>
             ) : (
@@ -626,7 +636,7 @@ const Summary = () => {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [selectedIndustries, setSelectedIndustries] = useState([]);
     const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
-    const [intentCounts, setIntentCounts] = useState({ High: 0, Medium: 0, Low: 0, Total: 0 });
+    const [intentCounts, setIntentCounts] = useState({ High: 0, 'High-Medium': 0, Medium: 0, Low: 0, Total: 0 });
 
     // Fetch technographics data and update context
     useEffect(() => {
@@ -712,10 +722,11 @@ const Summary = () => {
                 const data = await response.json();
 
                 // Calculate intent counts
-                const counts = { High: 0, Medium: 0, Low: 0 };
+                const counts = { High: 0, 'High-Medium': 0, Medium: 0, Low: 0 };
                 data.forEach(item => {
                     const status = item.intentStatus;
                     if (status === 'High') counts.High++;
+                    else if (status === 'High-Medium') counts['High-Medium']++;
                     else if (status === 'Medium') counts.Medium++;
                     else if (status === 'Low') counts.Low++;
                 });
@@ -947,11 +958,12 @@ const Summary = () => {
             marginBottom: '20px',
         },
         summaryPanel: {
-            padding: '15px',
+            padding: '24px',
             borderRadius: '8px',
             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4 rgb(0 0 0 / 0.1)',
             backgroundColor: 'white',
             border: '1px solid #e5e7eb',
+            minHeight: '450px',
         },
         panelTitle: {
             fontSize: '1.25rem',
@@ -1369,31 +1381,35 @@ const Summary = () => {
 
                 <div style={styles.summaryPanel}>
                     <div style={styles.panelTitle}>Intent distribution</div>
-                    {/* Intent distribution table (counts based on provided image) */}
-                    <div style={{ padding: '10px' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    {/* Intent distribution table */}
+                    <div style={{ padding: '15px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', border: 'none' }}>
                             <thead>
-                                <tr style={{ background: '#bfdbfe' }}>
-                                    <th style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Intent Status</th>
-                                    <th style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Total Accounts</th>
+                                <tr style={{ backgroundColor: 'rgb(59, 130, 246)' }}>
+                                    <th style={{ padding: '10px 12px', color: 'black', fontWeight: '600', fontSize: '13px', border: 'none' }}>Intent Status</th>
+                                    <th style={{ padding: '10px 12px', color: 'black', fontWeight: '600', fontSize: '13px', border: 'none' }}>Total Accounts</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>High</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.High}</td>
-                                </tr>
-                                <tr style={{ background: '#f3f4f6' }}>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Medium</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.Medium}</td>
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '600', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>High</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.High}</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Low</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.Low}</td>
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>High-Medium</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts['High-Medium']}</td>
                                 </tr>
-                                <tr style={{ background: '#f3f4f6' }}>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>Total</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>{intentCounts.Total}</td>
+                                <tr>
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Medium</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Medium}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Low</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Low}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Total</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '16px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Total}</td>
                                 </tr>
                             </tbody>
                         </table>

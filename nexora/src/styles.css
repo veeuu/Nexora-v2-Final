@@ -70,7 +70,7 @@ body {
 }
 
 .title {
-  font-weight: 700;
+  font-weight: 600;
   font-size: clamp(1.4rem, 2.5vw, 1.8rem);
   line-height: 1.2;
   margin-bottom: 0.25rem;
@@ -337,7 +337,8 @@ h2 {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 0.75rem;
   text-align: left;
   border-bottom: 1px solid #eee;
@@ -557,7 +558,7 @@ tr:hover {
   border-radius: 8px;
 }
 
-.stock-info > div {
+.stock-info>div {
   text-align: center;
   padding: 0.5rem;
 }
@@ -620,7 +621,7 @@ tr:hover {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .company-summary__legend .value {
@@ -790,7 +791,8 @@ tr:hover {
     border-radius: 8px;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.5rem;
     font-size: 0.85rem;
   }
@@ -847,12 +849,12 @@ tr:hover {
     padding: 12px;
   }
 
-  .stock-info > div {
+  .stock-info>div {
     padding: 0.5rem;
     font-size: 0.9rem;
   }
 
-  .stock-info > div:last-child {
+  .stock-info>div:last-child {
     grid-column: 1 / -1;
   }
 
@@ -873,7 +875,7 @@ tr:hover {
   }
 
   .brand-logo {
-    height: 30px;
+    height: 35px;
   }
 
   .brand-sep {
@@ -922,7 +924,8 @@ tr:hover {
     height: 160px;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.4rem;
     font-size: 0.8rem;
   }
@@ -948,14 +951,14 @@ tr:hover {
     padding: 10px;
   }
 
-  .stock-info > div {
+  .stock-info>div {
     padding: 0.4rem;
     font-size: 0.85rem;
     border-right: none !important;
     border-bottom: 1px solid #eee;
   }
 
-  .stock-info > div:last-child {
+  .stock-info>div:last-child {
     border-bottom: none;
   }
 }
@@ -987,6 +990,7 @@ tr:hover {
 
 /* Tablet */
 @media (max-width: 1024px) {
+
   .grid2up,
   [style*="grid-template-columns: repeat(2, 1fr)"] {
     grid-template-columns: 1fr !important;
@@ -995,6 +999,7 @@ tr:hover {
 
 /* Mobile */
 @media (max-width: 768px) {
+
   /* Martech Summary Container */
   [style*="padding: 20px"][style*="backgroundColor: #f4f4f9"] {
     padding: 1rem !important;
@@ -1107,6 +1112,7 @@ tr:hover {
 
 /* Small Mobile */
 @media (max-width: 480px) {
+
   /* Title */
   [style*="fontSize: 2rem"][style*="fontWeight: 700"] {
     font-size: 1.3rem !important;
@@ -1160,6 +1166,7 @@ tr:hover {
 
 /* ========== HEATMAP DROPDOWN MOBILE FIX ========== */
 @media (max-width: 768px) {
+
   /* HeatMap dropdown */
   #country-select {
     font-size: 16px !important;
@@ -1167,7 +1174,7 @@ tr:hover {
     -webkit-appearance: none;
     appearance: none;
   }
-  
+
   /* Ensure dropdown options are visible */
   #country-select option {
     font-size: 16px;
