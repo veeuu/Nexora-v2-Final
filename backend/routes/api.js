@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
+const mongoose = require('mongoose'); // Import mongoose
 // Assuming this file is in your 'routes' folder
 const yahooFinance = require('yahoo-finance2').default;
 const Company = require('../models/Company');
@@ -406,5 +407,29 @@ router.get('/stock/:ticker/:range', async (req, res) => {
     res.status(500).send('Server Error: Could not fetch stock data.');
   }
 });
+
+// @route   GET /api/intent
+// @desc    Get Intent data for all companies
+// @access  Public
+router.get('/intent', async (req, res) => {
+  try {
+    // Directly query the 'intent_data' collection
+    const intentCollection = mongoose.connection.db.collection('intent_data');
+    const intentDocs = await intentCollection.find({}).toArray();
+
+    // Map the documents to the format expected by the frontend
+    const intentData = intentDocs.map(item => ({
+      // Use the correct field names from your 'intent_data' collection
+      companyName: item['Company Name'], // Corrected field name
+      intentStatus: item['Intent Status']
+    }));
+
+    res.json(intentData);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 
 module.exports = router;

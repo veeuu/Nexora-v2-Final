@@ -1,94 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
-
+ 
 const fakeintentDataRaw = [
-  { accountName: 'Barbeques Galore Pty Limited', intentStatus: 'High' },
-  { accountName: 'Bhavana Tech Business Solutions Pvt Ltd', intentStatus: 'High' },
-  { accountName: 'DSO National Laboratories', intentStatus: 'Low' },
-  { accountName: 'AERODYNE GROUP', intentStatus: 'Low' },
-  { accountName: 'Thales Solutions Asia Pte. Ltd.', intentStatus: 'Low' },
-  { accountName: 'GISTDA (Geo-informatics and Space Technology Development Agency)', intentStatus: 'Low' },
-  { accountName: 'UPECA AEROTECH SDN. BHD.', intentStatus: 'Low' },
-  { accountName: 'GAMAFORCE UGM', intentStatus: 'Low' },
-  { accountName: 'Raytheon', intentStatus: 'Low' },
-  { accountName: 'Boeing', intentStatus: 'Low' },
-  { accountName: 'Lockheed Martin', intentStatus: 'Low' },
-  { accountName: 'General Dynamics', intentStatus: 'Low' },
-  { accountName: 'Northrop Grumman', intentStatus: 'Low' },
-  { accountName: 'Collins Aerospace', intentStatus: 'Low' },
-  { accountName: 'L3Harris Technologies', intentStatus: 'Low' },
-  { accountName: 'Pratt & Whitney', intentStatus: 'Low' },
-  { accountName: 'Textron', intentStatus: 'Low' },
-  { accountName: 'Cafe coffee day', intentStatus: 'High-Medium' },
-  { accountName: 'DAGANG NEXCHANGE BERHAD', intentStatus: 'High' },
-  { accountName: 'Dentsu', intentStatus: 'Medium' },
-  { accountName: 'Direc Business Technologies Inc.', intentStatus: 'High' },
-  { accountName: 'Direct Group', intentStatus: 'High-Medium' },
-  { accountName: 'Gadens', intentStatus: 'Medium' },
-  { accountName: 'GENTING BHD.', intentStatus: 'Medium' },
-  { accountName: 'Ginni Systems Ltd', intentStatus: 'High-Medium' },
-  { accountName: 'Glencore International AG', intentStatus: 'Medium' },
-  { accountName: 'HOLCIM', intentStatus: 'High-Medium' },
-  { accountName: 'INFYNIX', intentStatus: 'High' },
-  { accountName: 'Innovsource Pvt. Ltd.', intentStatus: 'High-Medium' },
-  { accountName: 'inoday Consultancy Services (P) Ltd', intentStatus: 'High-Medium' },
-  { accountName: 'Inovant Technologies', intentStatus: 'High' },
-  { accountName: 'Inquizity', intentStatus: 'High-Medium' },
-  { accountName: 'Inspace Technologies Private Limited', intentStatus: 'High-Medium' },
-  { accountName: 'Inspedia', intentStatus: 'High' },
-  { accountName: 'Instillmotion Labs pvt. ltd.', intentStatus: 'High' },
-  { accountName: 'Insynchq, Inc.', intentStatus: 'High-Medium' },
-  { accountName: 'INTACTIT INFOSYSTEMS PVT LTD', intentStatus: 'High-Medium' },
-  { accountName: 'Integrated Computer Systems, Inc.', intentStatus: 'High' },
-  { accountName: 'Integrated Global Solutions Sdn Bhd (IGS)', intentStatus: 'High' },
-  { accountName: 'Integrated Risk Insurance Brokers Limited', intentStatus: 'High' },
-  { accountName: 'Intelivita', intentStatus: 'High-Medium' },
-  { accountName: 'Intellection', intentStatus: 'High' },
-  { accountName: 'Intelligent Business Computer Systems Pvt Ltd,', intentStatus: 'Medium' },
-  { accountName: 'Intelligistic Technologies LLP', intentStatus: 'High' },
-  { accountName: 'Interact Technology Sdn Bhd', intentStatus: 'High-Medium' },
-  { accountName: 'Interactive Brokers', intentStatus: 'Medium' },
-  { accountName: 'interactivebees', intentStatus: 'High' },
-  { accountName: 'Interdeals Automation Sdn Bhd', intentStatus: 'High' },
-  { accountName: 'Interlinx Automation Sdn Bhd', intentStatus: 'High' },
-  { accountName: 'International Institute of Population Science', intentStatus: 'High-Medium' },
-  { accountName: 'Interpole Technologies Pvt. Ltd.', intentStatus: 'High-Medium' },
-  { accountName: 'Interview Cracker', intentStatus: 'High' },
-  { accountName: 'Intime solutions', intentStatus: 'High-Medium' },
-  { accountName: 'Intrious Technology Sdn Bhd', intentStatus: 'High' },
-  { accountName: 'Invanos Web Solutions', intentStatus: 'High-Medium' },
-  { accountName: 'Inventindia', intentStatus: 'High-Medium' },
-  { accountName: 'INVENTIZ ENTERPRISES', intentStatus: 'Medium' },
-  { accountName: 'iTuple Technologies', intentStatus: 'High-Medium' },
-  { accountName: 'IVTREE', intentStatus: 'High-Medium' },
-  { accountName: 'IXI International', intentStatus: 'High' },
-  { accountName: 'iXie Gaming', intentStatus: 'High' },
-  { accountName: 'IXS', intentStatus: 'High-Medium' },
-  { accountName: 'Ixsight', intentStatus: 'Medium' },
-  { accountName: 'Jaaji Software Technologies Private Limited', intentStatus: 'Medium' },
-  { accountName: 'Jainson Infotech', intentStatus: 'Medium' },
-  { accountName: 'Jannpaul', intentStatus: 'High' },
-  { accountName: 'Jash Entertainment', intentStatus: 'High' }
 ];
+  // This fake data is no longer used and can be removed.
 
-const intent = () => {
+
+const Intent = () => {
   const [tableData, setTableData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   useEffect(() => {
-    // For now use fake data; later will fetch real data
-    const normalize = (s) => {
-      if (!s) return '';
-      const lower = String(s).toLowerCase();
-      if (lower.includes('high')) return 'High';
-      if (lower.includes('low')) return 'Low';
-      if (lower.includes('medi')) return 'Medium';
-      return s;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/intent');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTableData(data);
+      } catch (e) {
+        setError(e.message);
+        console.error("Failed to fetch Intent data:", e);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const mapped = fakeintentDataRaw.map(r => ({ companyName: r.accountName, intentStatus: normalize(r.intentStatus) }));
-    setTableData(mapped);
+    fetchData();
   }, []);
 
   const { handleMouseEnter, handleMouseLeave } = createTooltipHandlers(setTooltip);
@@ -123,6 +66,14 @@ const intent = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  if (loading) {
+    return <div>Loading Intent data...</div>;
+  }
+
+  if (error) {
+    return <div>Error fetching data: {error}</div>;
+  }
 
   return (
     <div className="intent-container">
@@ -181,6 +132,7 @@ const intent = () => {
           overflow-y: auto;
           position: relative;
         }
+
         .sticky-header {
           position: sticky;
           top: 0;
@@ -188,11 +140,13 @@ const intent = () => {
           z-index: 10;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         table {
           width: 100%;
           border-collapse: collapse;
           table-layout: fixed;
         }
+
         th, td {
           padding: 12px 15px;
           text-align: left;
@@ -202,15 +156,20 @@ const intent = () => {
           text-overflow: ellipsis;
           cursor: default;
         }
+
         th:nth-child(1), td:nth-child(1) { width: 70%; }
         th:nth-child(2), td:nth-child(2) { width: 30%; }
+
         td { position: relative; }
+
         td:hover { background-color: #f9fafb; }
+
         th { background-color: #f8f9fa; font-weight: 600; }
+
         tr:hover { background-color: #f5f5f5; }
       `}</style>
     </div>
   );
 };
 
-export default intent;
+export default Intent;

@@ -626,6 +626,7 @@ const Summary = () => {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [selectedIndustries, setSelectedIndustries] = useState([]);
     const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
+    const [intentCounts, setIntentCounts] = useState({ High: 0, Medium: 0, Low: 0, Total: 0 });
 
     // Fetch technographics data and update context
     useEffect(() => {
@@ -699,6 +700,33 @@ const Summary = () => {
 
         fetchTechnographicsData();
     }, [setIndustryData, setTechnologyData, setAvailableRegions]);
+
+    // Fetch intent data for the summary table
+    useEffect(() => {
+        const fetchIntentData = async () => {
+            try {
+                const response = await fetch('/api/intent');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Calculate intent counts
+                const counts = { High: 0, Medium: 0, Low: 0 };
+                data.forEach(item => {
+                    const status = item.intentStatus;
+                    if (status === 'High') counts.High++;
+                    else if (status === 'Medium') counts.Medium++;
+                    else if (status === 'Low') counts.Low++;
+                });
+                counts.Total = data.length;
+                setIntentCounts(counts);
+            } catch (e) {
+                console.error("Failed to fetch Intent data for summary:", e);
+            }
+        };
+        fetchIntentData();
+    }, []);
 
     const sankeyDataResult = useMemo(() => getSankeyData(technographicsData, selectedCategories), [technographicsData, selectedCategories]);
     const overallSankeyData = { nodes: sankeyDataResult.nodes, links: sankeyDataResult.links };
@@ -899,18 +927,18 @@ const Summary = () => {
         overallSummary: {
             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
             padding: '20px',
-            backgroundColor: '#f4f4f9',
+            backgroundColor: '#ffffff',
         },
         title: {
             fontSize: '2rem',
             fontWeight: '700',
             color: '#1f2937',
-            marginBottom: '10px',
+            marginBottom: '5px',
         },
         divider: {
             height: '1px',
             backgroundColor: '#e5e7eb',
-            margin: '15px 0 30px 0',
+            margin: '10px 0 15px 0',
         },
         grid2up: {
             display: 'grid',
@@ -1352,20 +1380,20 @@ const Summary = () => {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Medium</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>29</td>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>High</td>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.High}</td>
                                 </tr>
                                 <tr style={{ background: '#f3f4f6' }}>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Medium</td>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.Medium}</td>
+                                </tr>
+                                <tr>
                                     <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>Low</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>26</td>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>{intentCounts.Low}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>High</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb' }}>15</td>
-                                </tr>
-                                <tr>
+                                <tr style={{ background: '#f3f4f6' }}>
                                     <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>Total</td>
-                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>70</td>
+                                    <td style={{ padding: '10px', border: '1px solid #e5e7eb', fontWeight: 700 }}>{intentCounts.Total}</td>
                                 </tr>
                             </tbody>
                         </table>
