@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
 
 const fakeintentDataRaw = [
   { accountName: 'Barbeques Galore Pty Limited', intentStatus: 'High' },
@@ -73,6 +74,7 @@ const fakeintentDataRaw = [
 const intent = () => {
   const [tableData, setTableData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   useEffect(() => {
     // For now use fake data; later will fetch real data
@@ -89,16 +91,26 @@ const intent = () => {
     setTableData(mapped);
   }, []);
 
-  const filteredData = tableData.filter(row =>
-    Object.values(row).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const { handleMouseEnter, handleMouseLeave } = createTooltipHandlers(setTooltip);
+
+  const filteredData = tableData
+    .filter(row =>
+      !searchTerm || Object.values(row).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      const aMatches = rowMatchesSearch(a, searchTerm);
+      const bMatches = rowMatchesSearch(b, searchTerm);
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return 0;
+    });
 
   const handleDownloadCSV = () => {
     if (filteredData.length === 0) return;
-    const headers = ['companyName','intentStatus'];
+    const headers = ['companyName', 'intentStatus'];
     const csvContent = [
       headers.join(','),
-      ...filteredData.map(row => headers.map(h => `"${String(row[h] ?? '').replace(/"/g,'""')}"`).join(','))
+      ...filteredData.map(row => headers.map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -143,15 +155,24 @@ const intent = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, idx) => (
-              <tr key={idx}>
-                <td>{row.companyName}</td>
-                <td>{row.intentStatus}</td>
-              </tr>
-            ))}
+            {filteredData.map((row, idx) => {
+              const isHighlighted = rowMatchesSearch(row, searchTerm);
+              return (
+                <tr key={idx} style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent' }}>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.companyName, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.intentStatus)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.intentStatus, searchTerm)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      <Tooltip tooltip={tooltip} />
 
       <style jsx>{`
         .table-container {
@@ -170,8 +191,21 @@ const intent = () => {
         table {
           width: 100%;
           border-collapse: collapse;
+          table-layout: fixed;
         }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; }
+        th, td {
+          padding: 12px 15px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: default;
+        }
+        th:nth-child(1), td:nth-child(1) { width: 70%; }
+        th:nth-child(2), td:nth-child(2) { width: 30%; }
+        td { position: relative; }
+        td:hover { background-color: #f9fafb; }
         th { background-color: #f8f9fa; font-weight: 600; }
         tr:hover { background-color: #f5f5f5; }
       `}</style>

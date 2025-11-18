@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
 
 const BuyerGroup = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -57,11 +59,21 @@ const BuyerGroup = () => {
     fetchData();
   }, []);
 
-  const filteredData = tableData.filter(row => {
-    return Object.values(row).some(value =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  const { handleMouseEnter, handleMouseLeave } = createTooltipHandlers(setTooltip);
+
+  const filteredData = tableData
+    .filter(row => {
+      return !searchTerm || Object.values(row).some(value =>
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    })
+    .sort((a, b) => {
+      const aMatches = rowMatchesSearch(a, searchTerm);
+      const bMatches = rowMatchesSearch(b, searchTerm);
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return 0;
+    });
 
   if (loading) {
     return <div>Loading Buyer Group data...</div>;
@@ -114,26 +126,49 @@ const BuyerGroup = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, index) => (
-              <tr key={index}>
-                {/* About */}
-                <td>{row.id}</td>
-                <td>{row.companyName}</td>
-                <td>{row.domain}</td>
-                <td>{row.industry}</td>
-                <td>{row.country}</td>
-                
-                {/* Buyer Group */}
-                <td>{row.buyerGroupName}</td>
-                <td>{row.relation}</td>
-                <td>{row.shares}</td>
-                <td>{row.description}</td>
-                <td>{row.date}</td>
-              </tr>
-            ))}
+            {filteredData.map((row, index) => {
+              const isHighlighted = rowMatchesSearch(row, searchTerm);
+              return (
+                <tr key={index} style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent' }}>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.id)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.id, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.companyName, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.domain, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.industry)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.industry, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.country)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.country, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.buyerGroupName)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.buyerGroupName, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.relation)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.relation, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.shares)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.shares, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.description)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.description, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.date)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.date, searchTerm)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      <Tooltip tooltip={tooltip} />
+
        <style jsx>{`
         .table-container {
           max-height: 400px;
@@ -158,6 +193,7 @@ const BuyerGroup = () => {
         table {
           width: 100%;
           border-collapse: collapse;
+          table-layout: fixed;
         }
         
         th, td {
@@ -165,7 +201,24 @@ const BuyerGroup = () => {
           text-align: left;
           border-bottom: 1px solid #ddd;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: default;
         }
+        
+        th:nth-child(1), td:nth-child(1) { width: 5%; }
+        th:nth-child(2), td:nth-child(2) { width: 12%; }
+        th:nth-child(3), td:nth-child(3) { width: 12%; }
+        th:nth-child(4), td:nth-child(4) { width: 10%; }
+        th:nth-child(5), td:nth-child(5) { width: 8%; }
+        th:nth-child(6), td:nth-child(6) { width: 12%; }
+        th:nth-child(7), td:nth-child(7) { width: 10%; }
+        th:nth-child(8), td:nth-child(8) { width: 8%; }
+        th:nth-child(9), td:nth-child(9) { width: 15%; }
+        th:nth-child(10), td:nth-child(10) { width: 8%; }
+        
+        td { position: relative; }
+        td:hover { background-color: #f9fafb; }
         
         th {
           background-color: #f8f9fa;

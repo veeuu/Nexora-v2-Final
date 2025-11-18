@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
 
 const NTP = () => {
   const [tableData, setTableData] = useState([]);
@@ -12,6 +13,7 @@ const NTP = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [modalContent, setModalContent] = useState(null);
+  const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -70,20 +72,29 @@ const NTP = () => {
     return [...new Set(allValues)].sort();
   };
 
-  const filteredData = tableData.filter(row => {
-    const filterMatches = Object.keys(filters).every(key => {
-      if (!filters[key]) return true;
-      // The data from MongoDB might have different casing or field names
-      const rowKey = key === 'companyName' ? 'companyName' : key;
-      return String(row[rowKey]) === filters[key];
+  const { handleMouseEnter, handleMouseLeave } = createTooltipHandlers(setTooltip);
+
+  const filteredData = tableData
+    .filter(row => {
+      const filterMatches = Object.keys(filters).every(key => {
+        if (!filters[key]) return true;
+        const rowKey = key === 'companyName' ? 'companyName' : key;
+        return String(row[rowKey]) === filters[key];
+      });
+
+      const searchMatches = !searchTerm || Object.values(row).some(value =>
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      return filterMatches && searchMatches;
+    })
+    .sort((a, b) => {
+      const aMatches = rowMatchesSearch(a, searchTerm);
+      const bMatches = rowMatchesSearch(b, searchTerm);
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return 0;
     });
-
-    const searchMatches = Object.values(row).some(value =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    return filterMatches && searchMatches;
-  });
 
   const handleAnalysisClick = (analysis) => {
     setModalContent(analysis);
@@ -188,23 +199,44 @@ const NTP = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, index) => (
-              <tr key={index}>
-                <td>{row.companyName}</td>
-                <td>{row.domain}</td> {/* Domain column */}
-                <td>{row.category}</td>
-                <td>{row.technology}</td>
-                <td>{row.purchaseProbability}</td>
-                <td>{row.purchasePrediction}</td>
-                <td 
-                  onClick={() => handleAnalysisClick(row.ntpAnalysis)} 
-                  style={{ cursor: 'pointer', color: '#010810ff', textDecoration: 'underline' }}
-                >{row.ntpAnalysis ? `${row.ntpAnalysis.substring(0, 30)}...` : 'N/A'}</td>
-              </tr>
-            ))}
+            {filteredData.map((row, index) => {
+              const isHighlighted = rowMatchesSearch(row, searchTerm);
+              return (
+                <tr key={index} style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent' }}>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.companyName, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.domain, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.category, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.technology)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.technology, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.purchaseProbability)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.purchaseProbability, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.purchasePrediction)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.purchasePrediction, searchTerm)}
+                  </td>
+                  <td 
+                    onClick={() => handleAnalysisClick(row.ntpAnalysis)} 
+                    onMouseEnter={(e) => handleMouseEnter(e, row.ntpAnalysis || 'N/A')}
+                    onMouseLeave={handleMouseLeave}
+                    style={{ cursor: 'pointer', color: '#010810ff', textDecoration: 'underline' }}
+                  >
+                    {row.ntpAnalysis ? highlightText(`${row.ntpAnalysis.substring(0, 30)}...`, searchTerm) : 'N/A'}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      <Tooltip tooltip={tooltip} />
 
       {modalContent && (
         <div className="modal-overlay" onClick={() => setModalContent(null)}>
@@ -240,6 +272,7 @@ const NTP = () => {
         table {
           width: 100%;
           border-collapse: collapse;
+          table-layout: fixed;
         }
         
         th, td {
@@ -247,7 +280,21 @@ const NTP = () => {
           text-align: left;
           border-bottom: 1px solid #ddd;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: default;
         }
+        
+        th:nth-child(1), td:nth-child(1) { width: 15%; }
+        th:nth-child(2), td:nth-child(2) { width: 15%; }
+        th:nth-child(3), td:nth-child(3) { width: 12%; }
+        th:nth-child(4), td:nth-child(4) { width: 12%; }
+        th:nth-child(5), td:nth-child(5) { width: 12%; }
+        th:nth-child(6), td:nth-child(6) { width: 12%; }
+        th:nth-child(7), td:nth-child(7) { width: 22%; }
+        
+        td { position: relative; }
+        td:hover { background-color: #f9fafb; }
         
         th {
           background-color: #f8f9fa;

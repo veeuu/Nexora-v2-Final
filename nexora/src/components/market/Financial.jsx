@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
 
 const Financial = () => {
   const [filters, setFilters] = useState({
@@ -11,6 +12,7 @@ const Financial = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -95,28 +97,37 @@ const Financial = () => {
   }, []);
 
 
-  const filteredData = tableData.filter(row => {
-    const matchesSearchTerm = Object.values(row).some(value => {
-      if (typeof value === 'string' || typeof value === 'number') {
-        return String(value).toLowerCase().includes(searchTerm.toLowerCase());
-      }
-      if (typeof value === 'object' && value !== null) {
-        // Search within nested objects like dailyPerformance
-        return Object.values(value).some(nestedValue =>
-          String(nestedValue).toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      return false;
+  const { handleMouseEnter, handleMouseLeave } = createTooltipHandlers(setTooltip);
+
+  const filteredData = tableData
+    .filter(row => {
+      const matchesSearchTerm = !searchTerm || Object.values(row).some(value => {
+        if (typeof value === 'string' || typeof value === 'number') {
+          return String(value).toLowerCase().includes(searchTerm.toLowerCase());
+        }
+        if (typeof value === 'object' && value !== null) {
+          return Object.values(value).some(nestedValue =>
+            String(nestedValue).toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+        return false;
+      });
+
+      const matchesFilters =
+        (filters.stockPerformance === '' || (filters.stockPerformance === 'High' && row.revenueGrowth && parseFloat(row.revenueGrowth) > 10) || (filters.stockPerformance === 'Medium' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 10 && parseFloat(row.revenueGrowth) > 5) || (filters.stockPerformance === 'Low' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 5)) &&
+        (filters.buyerHolder === '' || (filters.buyerHolder === 'Institutional' && row.marketCap && parseFloat(row.marketCap) > 10) || (filters.buyerHolder === 'Retail' && row.marketCap && parseFloat(row.marketCap) <= 10)) &&
+        (filters.mutualFundHolders === '' || (filters.mutualFundHolders === 'High' && row.marketCap && parseFloat(row.marketCap) > 20) || (filters.mutualFundHolders === 'Medium' && row.marketCap && parseFloat(row.marketCap) <= 20 && parseFloat(row.marketCap) > 5) || (filters.mutualFundHolders === 'Low' && row.marketCap && parseFloat(row.marketCap) <= 5)) &&
+        (filters.growth === '' || (filters.growth === 'High' && row.profitGrowth && parseFloat(row.profitGrowth) > 15) || (filters.growth === 'Medium' && row.profitGrowth && parseFloat(row.profitGrowth) <= 15 && parseFloat(row.profitGrowth) > 8) || (filters.growth === 'Low' && row.profitGrowth && parseFloat(row.profitGrowth) <= 8));
+
+      return matchesSearchTerm && matchesFilters;
+    })
+    .sort((a, b) => {
+      const aMatches = rowMatchesSearch(a, searchTerm);
+      const bMatches = rowMatchesSearch(b, searchTerm);
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return 0;
     });
-
-    const matchesFilters =
-      (filters.stockPerformance === '' || (filters.stockPerformance === 'High' && row.revenueGrowth && parseFloat(row.revenueGrowth) > 10) || (filters.stockPerformance === 'Medium' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 10 && parseFloat(row.revenueGrowth) > 5) || (filters.stockPerformance === 'Low' && row.revenueGrowth && parseFloat(row.revenueGrowth) <= 5)) &&
-      (filters.buyerHolder === '' || (filters.buyerHolder === 'Institutional' && row.marketCap && parseFloat(row.marketCap) > 10) || (filters.buyerHolder === 'Retail' && row.marketCap && parseFloat(row.marketCap) <= 10)) &&
-      (filters.mutualFundHolders === '' || (filters.mutualFundHolders === 'High' && row.marketCap && parseFloat(row.marketCap) > 20) || (filters.mutualFundHolders === 'Medium' && row.marketCap && parseFloat(row.marketCap) <= 20 && parseFloat(row.marketCap) > 5) || (filters.mutualFundHolders === 'Low' && row.marketCap && parseFloat(row.marketCap) <= 5)) &&
-      (filters.growth === '' || (filters.growth === 'High' && row.profitGrowth && parseFloat(row.profitGrowth) > 15) || (filters.growth === 'Medium' && row.profitGrowth && parseFloat(row.profitGrowth) <= 15 && parseFloat(row.profitGrowth) > 8) || (filters.growth === 'Low' && row.profitGrowth && parseFloat(row.profitGrowth) <= 8));
-
-    return matchesSearchTerm && matchesFilters;
-  });
 
   if (loading) {
     return <div>Loading Financial data...</div>;
@@ -183,36 +194,73 @@ const Financial = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, index) => (
-              <tr key={index}>
-                {/* About */}
-                <td>{row.id}</td>
-                <td>{row.companyName}</td>
-                <td>{row.domain}</td>
-                <td>{row.industry}</td>
-                <td>{row.fullTimeEmployees}</td>
-                <td>{row.investorWebsite}</td>
-                
-                {/* Location */}
-                <td>{row.exchange}</td>
-                <td>{row.address}</td>
-                <td>{row.city}</td>
-                <td>{row.state}</td>
-                <td>{row.country}</td>
-                <td>{row.contact}</td>
-                
-                {/* Finance */}
-                <td>{row.dateTime}</td>
-                <td>{row.currentPrice}</td>
-                <td>{row.marketCap}</td>
-                <td>{row.totalRevenue}</td>
-                <td>{row.revenueGrowth}</td>
-                <td>{row.profitGrowth}</td>
-              </tr>
-            ))}
+            {filteredData.map((row, index) => {
+              const isHighlighted = rowMatchesSearch(row, searchTerm);
+              return (
+                <tr key={index} style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent' }}>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.id)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.id, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.companyName, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.domain, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.industry)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.industry, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.fullTimeEmployees)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.fullTimeEmployees, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.investorWebsite)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.investorWebsite, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.exchange)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.exchange, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.address)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.address, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.city)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.city, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.state)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.state, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.country)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.country, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.contact)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.contact, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.dateTime)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.dateTime, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.currentPrice)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.currentPrice, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.marketCap)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.marketCap, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.totalRevenue)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.totalRevenue, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.revenueGrowth)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.revenueGrowth, searchTerm)}
+                  </td>
+                  <td onMouseEnter={(e) => handleMouseEnter(e, row.profitGrowth)} onMouseLeave={handleMouseLeave}>
+                    {highlightText(row.profitGrowth, searchTerm)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      <Tooltip tooltip={tooltip} />
+
        <style jsx>{`
         .table-container {
           max-height: 400px;
@@ -237,6 +285,7 @@ const Financial = () => {
         table {
           width: 100%;
           border-collapse: collapse;
+          table-layout: fixed;
         }
         
         th, td {
@@ -244,7 +293,32 @@ const Financial = () => {
           text-align: left;
           border-bottom: 1px solid #ddd;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: default;
         }
+        
+        th:nth-child(1), td:nth-child(1) { width: 4%; }
+        th:nth-child(2), td:nth-child(2) { width: 8%; }
+        th:nth-child(3), td:nth-child(3) { width: 8%; }
+        th:nth-child(4), td:nth-child(4) { width: 7%; }
+        th:nth-child(5), td:nth-child(5) { width: 6%; }
+        th:nth-child(6), td:nth-child(6) { width: 8%; }
+        th:nth-child(7), td:nth-child(7) { width: 6%; }
+        th:nth-child(8), td:nth-child(8) { width: 8%; }
+        th:nth-child(9), td:nth-child(9) { width: 6%; }
+        th:nth-child(10), td:nth-child(10) { width: 5%; }
+        th:nth-child(11), td:nth-child(11) { width: 6%; }
+        th:nth-child(12), td:nth-child(12) { width: 6%; }
+        th:nth-child(13), td:nth-child(13) { width: 7%; }
+        th:nth-child(14), td:nth-child(14) { width: 5%; }
+        th:nth-child(15), td:nth-child(15) { width: 5%; }
+        th:nth-child(16), td:nth-child(16) { width: 5%; }
+        th:nth-child(17), td:nth-child(17) { width: 5%; }
+        th:nth-child(18), td:nth-child(18) { width: 5%; }
+        
+        td { position: relative; }
+        td:hover { background-color: #f9fafb; }
         
         th {
           background-color: #f8f9fa;
