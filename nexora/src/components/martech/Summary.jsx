@@ -707,7 +707,7 @@ const Summary = () => {
     // Set default categories when data is loaded
     useEffect(() => {
         if (availableCategories.length > 0 && selectedCategories.length === 0) {
-            const defaultCategories = ['AI/ML', 'BI Tools', 'Back-End Technologies'];
+            const defaultCategories = ['AI/ML', 'Big Data', 'Blockchain'];
             const categoriesToSelect = defaultCategories.filter(cat => availableCategories.includes(cat));
             if (categoriesToSelect.length > 0) {
                 setSelectedCategories(categoriesToSelect);
