@@ -1452,29 +1452,53 @@ const Summary = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '600', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>High</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.High}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '600', fontSize: '14px', border: 'none' }}>High</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none' }}>{intentCounts.High}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>High-Medium</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts['High-Medium']}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none' }}>High-Medium</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none' }}>{intentCounts['High-Medium']}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Medium</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Medium}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none' }}>Medium</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none' }}>{intentCounts.Medium}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Low</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Low}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none' }}>Low</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none' }}>{intentCounts.Low}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Green Field Account</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none', backgroundColor: 'white' }}>{intentCounts['Green Field Account']}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#4b5563', fontWeight: '500', fontSize: '14px', border: 'none' }}>Green Field Account</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '600', fontSize: '15px', border: 'none' }}>{intentCounts['Green Field Account']}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '14px', border: 'none', backgroundColor: 'white' }}>Total</td>
-                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '16px', border: 'none', backgroundColor: 'white' }}>{intentCounts.Total}</td>
+                                <tr
+                                    style={{ transition: 'background-color 0.2s ease', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '14px', border: 'none' }}>Total</td>
+                                    <td style={{ padding: '10px 12px', color: '#1f2937', fontWeight: '700', fontSize: '16px', border: 'none' }}>{intentCounts.Total}</td>
                                 </tr>
                             </tbody>
                         </table>
