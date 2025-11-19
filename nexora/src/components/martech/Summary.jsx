@@ -349,7 +349,6 @@ const SankeyGraph = ({ data }) => {
             height: `${CHART_HEIGHT}px`,
             width: '100%',
             maxWidth: '100%',
-            minWidth: '600px',
             padding: '20px 10px',
             overflow: 'auto',
         },
