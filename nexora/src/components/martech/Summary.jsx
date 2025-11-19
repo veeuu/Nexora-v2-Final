@@ -122,14 +122,14 @@ const getSankeyData = (technographicsData, selectedCategories = []) => {
 
 // Removed unused aggregateWorldMapData function
 
-const CHART_HEIGHT = 380;
+const CHART_HEIGHT = 280;
 const COLUMN_X = {
-    Technologies: 80,
+    Technologies: 50,
     Category: 200,
-    Products: 340,
+    Products: 420,
 };
-const NODE_WIDTH = 130;
-const NODE_VERTICAL_SPACING = 32;
+const NODE_WIDTH = 150;
+const NODE_VERTICAL_SPACING = 28;
 
 const LINK_STROKE_WIDTH = 2;
 
@@ -147,6 +147,7 @@ const generateSankeyLinkPath = (x1, y1, x2, y2, width = 2) => {
 
 const SankeyGraph = ({ data }) => {
     const [hoveredNode, setHoveredNode] = useState(null);
+    const [expandedCategories, setExpandedCategories] = useState(new Set());
     const { nodes, links } = data;
 
     const rawNodeMap = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
@@ -194,7 +195,7 @@ const SankeyGraph = ({ data }) => {
 
             const categoryCenterY = productCount > 0
                 ? productYSum / productCount
-                : categoryStartBlockY + (NODE_VERTICAL_SPACING / 2);
+                : categoryStartBlockY;
 
             positions.set(cat.id, {
                 ...cat,
@@ -202,7 +203,8 @@ const SankeyGraph = ({ data }) => {
                 linkThickness: 20,
             });
 
-            currentY += NODE_VERTICAL_SPACING * 0.5;
+            // Add spacing between categories - more if no products, less if products exist
+            currentY += productCount > 0 ? NODE_VERTICAL_SPACING * 0.3 : NODE_VERTICAL_SPACING * 1.2;
         });
 
         const categoryNodes = categories.map(c => positions.get(c.id)).filter(n => n);
@@ -269,6 +271,16 @@ const SankeyGraph = ({ data }) => {
         );
     };
 
+    const toggleCategory = (categoryId) => {
+        const newExpanded = new Set(expandedCategories);
+        if (newExpanded.has(categoryId)) {
+            newExpanded.delete(categoryId);
+        } else {
+            newExpanded.add(categoryId);
+        }
+        setExpandedCategories(newExpanded);
+    };
+
     const renderNode = (node, max, column, align = 'left') => {
         const nodePos = nodePositions.get(node.id);
         if (!nodePos) return null;
@@ -283,23 +295,34 @@ const SankeyGraph = ({ data }) => {
             x = COLUMN_X.Products;
         }
 
-        const barWidth = column === 'Technologies' ? '80px' : `${NODE_WIDTH}px`;;
+        const barWidth = column === 'Technologies' ? '80px' : `${NODE_WIDTH}px`;
+        const isCategory = column === 'Category';
+        const isExpanded = expandedCategories.has(node.id);
 
         return (
             <div
                 key={node.id}
                 style={{
                     ...sankeyStyles.nodeWrapper(x, nodePos.y),
-                    width: column === 'Products' ? '300px' : barWidth,
+                    width: column === 'Products' ? '280px' : barWidth,
                     transform: hoveredNode === node.id ? 'translateY(-50%) scale(1.02)' : 'translateY(-50%) scale(1)',
                     boxShadow: hoveredNode === node.id ? `0 0 8px -2px ${node.color}` : 'none',
+                    cursor: isCategory ? 'pointer' : 'default',
                 }}
                 onMouseEnter={() => setHoveredNode(node.id)}
                 onMouseLeave={() => setHoveredNode(null)}
+                onClick={() => isCategory && toggleCategory(node.id)}
             >
                 {column !== 'Products' && (
                     <>
-                        <div style={sankeyStyles.nodeLabel(align)}>{node.id}</div>
+                        <div style={{ ...sankeyStyles.nodeLabel(align), display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {node.id}
+                            {isCategory && (
+                                <span style={{ fontSize: '10px', color: '#9ca3af' }}>
+                                    {isExpanded ? '▼' : '▶'}
+                                </span>
+                            )}
+                        </div>
                         <div style={sankeyStyles.nodeBarContainer}>
                             <div style={sankeyStyles.nodeBar(node.value, max, node.color)} />
                         </div>
@@ -326,8 +349,9 @@ const SankeyGraph = ({ data }) => {
             height: `${CHART_HEIGHT}px`,
             width: '100%',
             maxWidth: '100%',
-            padding: '20px 5px',
-            overflow: 'hidden',
+            minWidth: '600px',
+            padding: '20px 10px',
+            overflow: 'auto',
         },
         svgOverlay: {
             position: 'absolute',
@@ -376,9 +400,44 @@ const SankeyGraph = ({ data }) => {
     };
 
 
+    // Filter products and links based on expanded categories
+    const visibleProducts = products.filter(prod => {
+        const parentLink = links.find(l => l.target === prod.id && categoryIds.has(l.source));
+        return parentLink && expandedCategories.has(parentLink.source);
+    });
+
+    const visibleLinks = links.filter(link => {
+        // Always show links from Technologies to Categories
+        if (link.source === 'Technologies') return true;
+        // Only show links from Category to Products if category is expanded
+        if (categoryIds.has(link.source)) {
+            return expandedCategories.has(link.source);
+        }
+        return false;
+    });
+
+    // Calculate dynamic height based on number of visible products
+    const baseHeight = 280;
+    // Calculate actual content height
+    const extraHeight = visibleProducts.length > 0 ? visibleProducts.length * NODE_VERTICAL_SPACING : 0;
+    const contentHeight = baseHeight + extraHeight;
+    // Set max height for scrolling
+    const maxHeight = 400;
+    const shouldScroll = contentHeight > maxHeight;
+
     return (
-        <div style={sankeyStyles.container}>
-            <svg style={sankeyStyles.svgOverlay}>
+        <div style={{
+            ...sankeyStyles.container,
+            height: shouldScroll ? `${maxHeight}px` : `${contentHeight}px`,
+            maxHeight: `${maxHeight}px`,
+            overflowY: shouldScroll ? 'scroll' : 'hidden',
+            transition: 'height 0.3s ease',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+        }}
+            className="hide-scrollbar"
+        >
+            <svg style={{ ...sankeyStyles.svgOverlay, height: `${contentHeight}px` }}>
                 <defs>
                     {/* Add subtle gradient for links */}
                     <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -386,7 +445,7 @@ const SankeyGraph = ({ data }) => {
                         <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0.4 }} />
                     </linearGradient>
                 </defs>
-                {links.map(renderLink)}
+                {visibleLinks.map(renderLink)}
             </svg>
 
             <h3 style={{ position: 'absolute', top: '10px', left: `${COLUMN_X.Category}px`, fontSize: '14px', fontWeight: '600', color: '#6b7280' }}>Category</h3>
@@ -394,7 +453,7 @@ const SankeyGraph = ({ data }) => {
 
             {techNode && renderNode(techNode, totalTechnologies, 'Technologies', 'center')}
             {categories.map(cat => renderNode(cat, maxCategoryValue, 'Category', 'left'))}
-            {products.map(prod => renderNode(prod, maxProductValue, 'Products', 'left'))}
+            {visibleProducts.map(prod => renderNode(prod, maxProductValue, 'Products', 'left'))}
         </div>
     );
 };
@@ -964,7 +1023,9 @@ const Summary = () => {
             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4 rgb(0 0 0 / 0.1)',
             backgroundColor: 'white',
             border: '1px solid #e5e7eb',
-            minHeight: '450px',
+            minHeight: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
         },
         panelTitle: {
             fontSize: '1.25rem',
@@ -1427,6 +1488,13 @@ const Summary = () => {
                 </div>
             </div>
             <style>{`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
                 @media (max-width: 768px) {
                     [style*="display: flex"][style*="gap: 30px"][style*="minHeight: 300px"] {
                         flex-direction: column !important;
