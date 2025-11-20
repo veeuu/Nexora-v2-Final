@@ -1,32 +1,67 @@
 import { useState } from 'react';
+import img1 from './assests/1Rivet_India.png';
+import img2 from './assests/2Base_Technologies_Pvt_Ltd_India.png';
+import img3 from './assests/2Coms_Consulting_INDIA.png';
+import img4 from './assests/3I_Infotech_Consultancy_Ltd_India.png';
+import img5 from './assests/4DCompass_InfoSolutions_Private_Limited_INDIA.png';
+import img6 from './assests/4G_Identity_Solutions_Pvt_Limited_India.png';
+import img7 from './assests/10XDS_INDIA.png';
+import img8 from './assests/42Gears_Mobility_Systems_Pvt_Limited_India.png';
+import img9 from './assests/300_Innovative_Solutions_INDIA.png';
+import img10 from './assests/Cpl3_Bhingar_Urban_Bank_Galaxy_Office_Automation_India.png';
 
 const BuyingGroup = () => {
-    // Sample data with company names and their corresponding Google Drive image links
+    // Company data with imported images
     const companyData = [
         {
             id: 1,
-            name: '10XDS',
-            imageUrl: 'https://drive.google.com/thumbnail?id=1luyAB1Hkm8Y0JRyoM4XBqcuTcuJ-tgFJ&sz=w5000'
+            name: '#CPL3-Bhingar Urban Bank-Galaxy Office Automation',
+            imageUrl: img10
         },
         {
             id: 2,
-            name: '2Base Technologies Pvt. Ltd',
-            imageUrl: 'https://drive.google.com/thumbnail?id=14tgOllVJPW5blie7DioSJUqzIkzs8oX1&sz=w5000'
+            name: '10XDS',
+            imageUrl: img7
         },
         {
             id: 3,
-            name: '3I Infotech Consultancy Ltd',
-            imageUrl: 'https://drive.google.com/thumbnail?id=18-XnqqEwI0V3S_YikfIUhOnAtiUeeg7z&sz=w5000'
+            name: '1Rivet',
+            imageUrl: img1
         },
-        // {
-        //     id: 4,
-        //     name: '4DCompass InfoSolutions Private Limited',
-        //     imageUrl: 'https://drive.google.com/thumbnail?id=1qACb8oZR5nbI7Iv3K4o-pVKA4fvMqBq7&sz=w5000'
-        // },
+        {
+            id: 4,
+            name: '2Base Technologies Pvt. Ltd',
+            imageUrl: img2
+        },
         {
             id: 5,
-            name: '88 Pictures',
-            imageUrl: 'https://drive.google.com/thumbnail?id=1DfkyWntcCOdmm8_2uhqlZXbEIswRDoj8&sz=w5000'
+            name: '2Coms Consulting',
+            imageUrl: img3
+        },
+        {
+            id: 6,
+            name: '300 Innovative Solutions',
+            imageUrl: img9
+        },
+        {
+            id: 7,
+            name: '3I Infotech Consultancy Ltd',
+            imageUrl: img4
+        },
+        {
+            id: 8,
+            name: '42Gears Mobility Systems Pvt Limited',
+            imageUrl: img8
+        },
+        {
+            id: 9,
+            name: '4DCompass InfoSolutions Private Limited',
+            imageUrl: img5
+        },
+        {
+            id: 10,
+            name: '4G Identity Solutions Pvt. Limited',
+            imageUrl: img6
         },
     ];
 

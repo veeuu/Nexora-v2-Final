@@ -37,6 +37,35 @@ const RenewalIntelligence = () => {
         }));
     };
 
+    const downloadCSV = () => {
+        if (filteredData.length === 0) {
+            alert('No data to download');
+            return;
+        }
+
+        // Create CSV header
+        const headers = ['Account Name', 'Product', 'Renewal QTR'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredData.map(row =>
+                [row.companyName, row.product, row.qtr]
+                    .map(field => `"${field}"`)
+                    .join(',')
+            )
+        ].join('\n');
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `renewal-intelligence-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const getUniqueCompanies = () => {
         if (!tableData) return [];
         const allCompanies = tableData.map(item => item.companyName);
@@ -68,8 +97,9 @@ const RenewalIntelligence = () => {
         const colors = {
             'Q1 2025': '#3b82f6',
             'Q2 2025': '#1e3a8a',
-            'Q3 2025': '#f97316',
-            'Q4 2025': '#7c3aed'
+            'Q3 2025': '#bb4219ff',
+            'Q4 2025': '#7c3aed',
+            'Q1 2026': '#0f172a'
         };
 
         filteredData.forEach(row => {
@@ -112,6 +142,24 @@ const RenewalIntelligence = () => {
         <div className="renewal-intelligence-container">
             <div className="header-actions">
                 <h2>Renewal Intelligence</h2>
+                <button
+                    onClick={downloadCSV}
+                    style={{
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        padding: '10px 15px',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#45a049'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#4CAF50'}
+                >
+                    Download CSV
+                </button>
             </div>
 
             <div className="section-subtle-divider" />

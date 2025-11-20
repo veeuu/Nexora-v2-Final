@@ -213,8 +213,8 @@ const Technographics = () => {
             onChange={(e) => handleFilterChange('companyName', e.target.value)}
           >
             <option value="">All</option>
-            {getUniqueOptions('companyName').map(name => (
-              <option key={name} value={name}>{name}</option>
+            {getUniqueOptions('companyName').map((name, idx) => (
+              <option key={`company-${idx}`} value={name}>{name}</option>
             ))}
           </select>
         </div>
@@ -226,8 +226,8 @@ const Technographics = () => {
             onChange={(e) => handleFilterChange('region', e.target.value)}
           >
             <option value="">All</option>
-            {getUniqueOptions('region').map(region => (
-              <option key={region} value={region}>{region}</option>
+            {getUniqueOptions('region').map((region, idx) => (
+              <option key={`region-${idx}`} value={region}>{region}</option>
             ))}
           </select>
         </div>
@@ -239,8 +239,8 @@ const Technographics = () => {
             onChange={(e) => handleFilterChange('category', e.target.value)}
           >
             <option value="">All</option>
-            {getUniqueOptions('category').map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {getUniqueOptions('category').map((cat, idx) => (
+              <option key={`category-${idx}`} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
@@ -249,8 +249,8 @@ const Technographics = () => {
           <label>Technology</label>
           <select value={filters.technology} onChange={(e) => handleFilterChange('technology', e.target.value)}>
             <option value="">All</option>
-            {getUniqueOptions('technology').map(tech => (
-              <option key={tech} value={tech}>{tech}</option>
+            {getUniqueOptions('technology').map((tech, idx) => (
+              <option key={`technology-${idx}`} value={tech}>{tech}</option>
             ))}
           </select>
         </div>
