@@ -50,7 +50,7 @@ body {
 }
 
 .brand-logo {
-  height: 45px;
+  height: 38px;
   width: auto;
   display: inline-block;
   flex-shrink: 0;
@@ -675,7 +675,7 @@ tr:hover {
   }
 
   .brand-logo {
-    height: 35px;
+    height: 38px;
   }
 
   .menu {
