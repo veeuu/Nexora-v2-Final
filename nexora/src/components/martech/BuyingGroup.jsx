@@ -18,11 +18,11 @@ const BuyingGroup = () => {
             name: '3I Infotech Consultancy Ltd',
             imageUrl: 'https://drive.google.com/thumbnail?id=18-XnqqEwI0V3S_YikfIUhOnAtiUeeg7z&sz=w5000'
         },
-        {
-            id: 4,
-            name: '4DCompass InfoSolutions Private Limited',
-            imageUrl: 'https://drive.google.com/thumbnail?id=1qACb8oZR5nbI7Iv3K4o-pVKA4fvMqBq7&sz=w5000'
-        },
+        // {
+        //     id: 4,
+        //     name: '4DCompass InfoSolutions Private Limited',
+        //     imageUrl: 'https://drive.google.com/thumbnail?id=1qACb8oZR5nbI7Iv3K4o-pVKA4fvMqBq7&sz=w5000'
+        // },
         {
             id: 5,
             name: '88 Pictures',
@@ -31,11 +31,17 @@ const BuyingGroup = () => {
     ];
 
     const [selectedCompany, setSelectedCompany] = useState(companyData[0].id);
+    const [imageError, setImageError] = useState(false);
 
     const currentCompany = companyData.find(company => company.id === selectedCompany);
 
     const handleCompanyChange = (e) => {
         setSelectedCompany(parseInt(e.target.value));
+        setImageError(false);
+    };
+
+    const handleImageError = () => {
+        setImageError(true);
     };
 
     return (
@@ -80,27 +86,26 @@ const BuyingGroup = () => {
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}>
-                        <img
-                            src={currentCompany.imageUrl}
-                            alt={currentCompany.name}
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '600px',
-                                objectFit: 'contain',
-                                borderRadius: '6px'
-                            }}
-                            onError={(e) => {
-                                e.target.style.display = 'none';
-                                if (e.target.parentElement) {
-                                    e.target.parentElement.innerHTML = '<p style="color: #9ca3af; font-size: 16px;">Image not available</p>';
-                                }
-                            }}
-                        />
+                        {imageError ? (
+                            <p style={{ color: '#9ca3af', fontSize: '16px' }}>Image not available</p>
+                        ) : (
+                            <img
+                                src={currentCompany.imageUrl}
+                                alt={currentCompany.name}
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '600px',
+                                    objectFit: 'contain',
+                                    borderRadius: '6px'
+                                }}
+                                onError={handleImageError}
+                            />
+                        )}
                     </div>
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .filters {
                     display: flex;
                     gap: 15px;

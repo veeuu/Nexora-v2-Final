@@ -431,5 +431,26 @@ router.get('/intent', async (req, res) => {
   }
 });
 
+router.get('/renewal-intelligence', async (req, res) => {
+  try {
+    const { companyName } = req.query; // Filter by 'Company Name'
+    const renewalCollection = mongoose.connection.db.collection('renewal_intel');
+
+    const query = companyName ? { 'Company Name': companyName } : {};
+    const renewalDocs = await renewalCollection.find(query).toArray();
+
+    const renewalData = renewalDocs.map(item => ({
+      companyName: item['Company Name'],
+      product: item.Keyword, // Using Keyword as Product
+      renewalDate: item['Renewal Date'],
+      qtr: item['Renewal Date'] // The quarter is the same as the renewal date
+    }));
+    res.json(renewalData);
+  } catch (err) {
+    console.error('Error fetching renewal intelligence data:', err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 
 module.exports = router;
