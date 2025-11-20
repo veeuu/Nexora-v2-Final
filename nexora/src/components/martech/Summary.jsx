@@ -427,14 +427,9 @@ const SankeyGraph = ({ data }) => {
     return (
         <div style={{
             ...sankeyStyles.container,
-            height: shouldScroll ? `${maxHeight}px` : `${contentHeight}px`,
-            maxHeight: `${maxHeight}px`,
-            overflowY: shouldScroll ? 'scroll' : 'hidden',
+            height: `${contentHeight}px`,
             transition: 'height 0.3s ease',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
         }}
-            className="hide-scrollbar"
         >
             <svg style={{ ...sankeyStyles.svgOverlay, height: `${contentHeight}px` }}>
                 <defs>
@@ -1023,8 +1018,12 @@ const Summary = () => {
             backgroundColor: 'white',
             border: '1px solid #e5e7eb',
             minHeight: 'auto',
+            maxHeight: '400px',
             display: 'flex',
             flexDirection: 'column',
+            overflowY: 'scroll',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
         },
         panelTitle: {
             fontSize: '1.25rem',
@@ -1517,6 +1516,22 @@ const Summary = () => {
                 .hide-scrollbar {
                     -ms-overflow-style: none;
                     scrollbar-width: none;
+                }
+                [style*="overflowY: scroll"]::-webkit-scrollbar,
+                [style*="overflowY: auto"]::-webkit-scrollbar,
+                [style*="overflow: scroll"]::-webkit-scrollbar,
+                [style*="overflow: auto"]::-webkit-scrollbar {
+                    display: none;
+                    width: 0;
+                    height: 0;
+                }
+                * {
+                    scrollbar-width: none;
+                }
+                *::-webkit-scrollbar {
+                    display: none;
+                    width: 0;
+                    height: 0;
                 }
                 @media (max-width: 768px) {
                     [style*="display: flex"][style*="gap: 30px"][style*="minHeight: 300px"] {
