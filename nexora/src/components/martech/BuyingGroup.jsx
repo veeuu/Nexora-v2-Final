@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const BuyingGroup = () => {
     // Sample data with company names and their corresponding Google Drive image links
@@ -45,55 +45,19 @@ const BuyingGroup = () => {
             </h1>
 
             {/* Filter Section */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '20px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                marginBottom: '20px',
-                border: '1px solid #e5e7eb'
-            }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151', marginBottom: '15px' }}>
-                    Filters
-                </h2>
-
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '15px' }}>
-                    {/* Company Name Dropdown */}
-                    <div style={{ flex: 1, maxWidth: '300px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            Select Company
-                        </label>
-                        <select
-                            value={selectedCompany}
-                            onChange={handleCompanyChange}
-                            style={{
-                                width: '100%',
-                                padding: '10px 12px',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontFamily: 'inherit',
-                                outline: 'none',
-                                transition: 'border-color 0.2s',
-                                backgroundColor: 'white',
-                                cursor: 'pointer'
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                        >
-                            {companyData.map(company => (
-                                <option key={company.id} value={company.id}>
-                                    {company.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+            <div className="filters" style={{ marginBottom: '20px' }}>
+                <div className="filter-group">
+                    <label>Company Name</label>
+                    <select
+                        value={selectedCompany}
+                        onChange={handleCompanyChange}
+                    >
+                        {companyData.map(company => (
+                            <option key={company.id} value={company.id}>
+                                {company.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
@@ -127,12 +91,54 @@ const BuyingGroup = () => {
                             }}
                             onError={(e) => {
                                 e.target.style.display = 'none';
-                                e.target.parentElement.innerHTML = '<p style="color: #9ca3af; fontSize: 16px;">Image not available</p>';
+                                if (e.target.parentElement) {
+                                    e.target.parentElement.innerHTML = '<p style="color: #9ca3af; font-size: 16px;">Image not available</p>';
+                                }
                             }}
                         />
                     </div>
                 )}
             </div>
+
+            <style jsx>{`
+                .filters {
+                    display: flex;
+                    gap: 15px;
+                    flex-wrap: wrap;
+                }
+
+                .filter-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .filter-group label {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #374151;
+                }
+
+                .filter-group select {
+                    padding: 10px 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-family: inherit;
+                    background-color: white;
+                    cursor: pointer;
+                    transition: border-color 0.2s;
+                }
+
+                .filter-group select:focus {
+                    outline: none;
+                    border-color: #3b82f6;
+                }
+
+                .filter-group select:hover {
+                    border-color: #9ca3af;
+                }
+            `}</style>
         </div>
     );
 };
