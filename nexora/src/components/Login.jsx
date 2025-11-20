@@ -6,7 +6,7 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin123') {
+    if (username === 'Nexora' && password === 'Proplus@2025') {
       onLogin(true);
     } else {
       alert('Incorrect username or password');

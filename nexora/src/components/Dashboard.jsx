@@ -6,6 +6,8 @@ import MartechSummary from './martech/Summary';
 import MartechNTP from './martech/NTP';
 import Martechintent from './martech/Intent';
 import MartechTechnographics from './martech/Technographics';
+import RenewalIntelligence from './martech/RenewalIntelligence';
+import MartechBuyingGroup from './martech/BuyingGroup';
 import MarketSummary from './market/Summary';
 // import MarketNTP from './market/NTP'; // Commented out as requested
 import MarketFinancial from './market/Financial';
@@ -28,8 +30,8 @@ const Dashboard = ({ onLogout }) => {
   };
 
   const getMenuItems = () => {
-    return activeView === 'Martech' 
-  ? ['Summary', 'Technographics','NTP', 'Intent']
+    return activeView === 'Martech'
+      ? ['Summary', 'Technographics', 'Renewal Intelligence', 'NTP', 'Intent', 'Buying Group']
       : ['Summary', /* 'NTP', */ 'Financial', 'Stock Performance', 'Buyer Group', 'Growth', 'Mutual Fund']; // Added 'Mutual Fund' to the menu
   };
 
@@ -44,6 +46,10 @@ const Dashboard = ({ onLogout }) => {
           return <Martechintent />;
         case 'Technographics':
           return <MartechTechnographics />;
+        case 'Renewal Intelligence':
+          return <RenewalIntelligence />;
+        case 'Buying Group':
+          return <MartechBuyingGroup />;
         default:
           return <MartechSummary />;
       }
@@ -74,7 +80,7 @@ const Dashboard = ({ onLogout }) => {
       <div className="dashboard">
         <Header onDropdownChange={handleDropdownChange} />
         <div className="dashboard-content">
-          <Menu 
+          <Menu
             activeSection={activeSection}
             onMenuClick={handleMenuClick}
             menuItems={getMenuItems()}

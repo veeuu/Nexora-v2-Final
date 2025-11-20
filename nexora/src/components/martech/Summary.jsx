@@ -1113,7 +1113,7 @@ const Summary = () => {
 
     return (
         <div style={styles.overallSummary}>
-            <h2 style={styles.title}>Technology Summary</h2>
+            <h2 style={styles.title}>Insights Panel</h2>
             <div style={styles.divider} />
 
             <div style={styles.grid2up}>
