@@ -164,8 +164,8 @@ const RenewalIntelligence = () => {
             </div>
 
             {/* Main Content Container */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '20px', minWidth: 0 }}>
-                {/* Table Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '20px', minWidth: 0 }}>
+                {/* Table Section - Left */}
                 <div style={{ minWidth: 0 }}>
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -178,11 +178,16 @@ const RenewalIntelligence = () => {
                     ) : (
                         <div className="table-container">
                             <table>
+                                <colgroup>
+                                    <col style={{ width: '40%' }} />
+                                    <col style={{ width: '15%' }} />
+                                    <col style={{ width: '20%' }} />
+                                </colgroup>
                                 <thead className="sticky-header">
                                     <tr>
                                         <th style={{ textAlign: 'left' }}>Account Name</th>
-                                        <th>Product</th>
-                                        <th>Renewal QTR</th>
+                                        <th style={{ textAlign: 'left' }}>Product</th>
+                                        <th style={{ textAlign: 'left' }}>Renewal QTR</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -229,11 +234,11 @@ const RenewalIntelligence = () => {
                     )}
                 </div>
 
-                {/* Bar Chart Section */}
+                {/* Bar Chart Section - Right */}
                 <div style={{
                     backgroundColor: 'white',
                     borderRadius: '8px',
-                    padding: '20px',
+                    padding: '15px',
                     border: '1px solid #d1d5db',
                     display: 'flex',
                     flexDirection: 'column',
@@ -241,7 +246,7 @@ const RenewalIntelligence = () => {
                     flexShrink: 0,
                     height: '400px'
                 }}>
-                    <h2 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '20px', margin: 0 }}>
+                    <h2 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#374151', marginBottom: '15px', margin: 0 }}>
                         Renewal Distribution
                     </h2>
                     {filteredData.length === 0 ? (
@@ -251,9 +256,9 @@ const RenewalIntelligence = () => {
                             justifyContent: 'center',
                             flex: 1,
                             color: '#9ca3af',
-                            fontSize: '13px'
+                            fontSize: '12px'
                         }}>
-                            Select filters to view chart
+                            Select filters
                         </div>
                     ) : chartData.length === 0 ? (
                         <div style={{
@@ -262,9 +267,9 @@ const RenewalIntelligence = () => {
                             justifyContent: 'center',
                             flex: 1,
                             color: '#9ca3af',
-                            fontSize: '13px'
+                            fontSize: '12px'
                         }}>
-                            No data to display
+                            No data
                         </div>
                     ) : (
                         <div style={{
@@ -272,26 +277,26 @@ const RenewalIntelligence = () => {
                             alignItems: 'flex-end',
                             justifyContent: 'space-between',
                             flex: 1,
-                            gap: '8px',
+                            gap: '4px',
                             minWidth: 0
                         }}>
                             {chartData.map((item, idx) => (
                                 <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0 }}>
                                     <div style={{
-                                        fontSize: '12px',
+                                        fontSize: '10px',
                                         fontWeight: '600',
                                         color: '#1f2937',
-                                        marginBottom: '6px',
+                                        marginBottom: '4px',
                                         whiteSpace: 'nowrap'
                                     }}>
                                         {item.value}
                                     </div>
                                     <div style={{
                                         width: '100%',
-                                        maxWidth: '50px',
-                                        height: maxChartValue > 0 ? `${(item.value / maxChartValue) * 280}px` : '0px',
+                                        maxWidth: '30px',
+                                        height: maxChartValue > 0 ? `${(item.value / maxChartValue) * 250}px` : '0px',
                                         backgroundColor: item.color,
-                                        borderRadius: '3px 3px 0 0',
+                                        borderRadius: '2px 2px 0 0',
                                         transition: 'all 0.3s ease',
                                         cursor: 'pointer'
                                     }}
@@ -305,13 +310,13 @@ const RenewalIntelligence = () => {
                                         }}
                                     ></div>
                                     <div style={{
-                                        fontSize: '10px',
+                                        fontSize: '8px',
                                         color: '#6b7280',
-                                        marginTop: '6px',
+                                        marginTop: '4px',
                                         textAlign: 'center',
-                                        maxWidth: '60px',
+                                        maxWidth: '50px',
                                         wordWrap: 'break-word',
-                                        lineHeight: '1.2'
+                                        lineHeight: '1.1'
                                     }}>
                                         {item.label}
                                     </div>
@@ -376,7 +381,8 @@ const RenewalIntelligence = () => {
 
                 .table-container {
                     height: 400px;
-                    overflow-x: auto;
+                    /* remove horizontal scroll and keep vertical scroll only */
+                    overflow-x: hidden;
                     overflow-y: auto;
                     position: relative;
                     border: 1px solid #e5e7eb;
@@ -392,26 +398,35 @@ const RenewalIntelligence = () => {
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
 
+                /* keep THs non-sticky individually to avoid width/offset misalignment */
                 .sticky-header th {
-                    position: sticky;
-                    top: 0;
+                    position: relative;
                 }
 
                 table {
                     width: 100%;
                     border-collapse: collapse;
                     table-layout: fixed;
+                    min-width: 0;
+                    box-sizing: border-box;
                 }
 
                 th, td {
-                    padding: 12px 15px;
+                    padding: 3px 6px;
+                    font-size: 13px;
                     text-align: left;
                     border-bottom: 1px solid #ddd;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     cursor: default;
+                    box-sizing: border-box;
                 }
+
+                /* Explicitly enforce column width constraints so Renewal QTR is visible */
+                td:nth-child(1), th:nth-child(1) { width: 20%; }
+                td:nth-child(2), th:nth-child(2) { width: 40%; }
+                td:nth-child(3), th:nth-child(3) { width: 40%; }
 
                 td {
                     position: relative;

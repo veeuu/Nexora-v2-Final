@@ -995,7 +995,7 @@ const Summary = () => {
             backgroundColor: '#ffffff',
         },
         title: {
-            fontSize: '2rem',
+            fontSize: 'clamp(1.2rem, 2vw, 1.4rem)',
             fontWeight: '700',
             color: '#1f2937',
             marginBottom: '5px',
