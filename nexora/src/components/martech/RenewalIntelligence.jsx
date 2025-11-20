@@ -405,7 +405,7 @@ const RenewalIntelligence = () => {
 
                 th, td {
                     padding: 12px 15px;
-                    text-align: center;
+                    text-align: left;
                     border-bottom: 1px solid #ddd;
                     white-space: nowrap;
                     overflow: hidden;
