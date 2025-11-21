@@ -31,7 +31,7 @@ const Dashboard = ({ onLogout }) => {
 
   const getMenuItems = () => {
     return activeView === 'Martech'
-      ? ['Insights Panel', 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group','NTP']
+      ? ['Insights Panel', 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group', 'NTP®']
       : ['Summary', /* 'NTP', */ 'Financial', 'Stock Performance', 'Buyer Group', 'Growth', 'Mutual Fund']; // Added 'Mutual Fund' to the menu
   };
 
@@ -41,6 +41,7 @@ const Dashboard = ({ onLogout }) => {
         case 'Summary':
           return <MartechSummary />;
         case 'NTP':
+        case 'NTP®':
           return <MartechNTP />;
         case 'Intent':
           return <Martechintent />;

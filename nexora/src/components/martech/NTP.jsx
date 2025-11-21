@@ -222,9 +222,7 @@ const NTP = () => {
                     {highlightText(row.purchasePrediction, searchTerm)}
                   </td>
                   <td 
-                    onClick={() => handleAnalysisClick(row.ntpAnalysis)} 
-                    onMouseEnter={(e) => handleMouseEnter(e, row.ntpAnalysis || 'N/A')}
-                    onMouseLeave={handleMouseLeave}
+                    onClick={() => handleAnalysisClick(row.ntpAnalysis)}
                     style={{ cursor: 'pointer', color: '#010810ff', textDecoration: 'underline' }}
                   >
                     {row.ntpAnalysis ? highlightText(`${row.ntpAnalysis.substring(0, 30)}...`, searchTerm) : 'N/A'}

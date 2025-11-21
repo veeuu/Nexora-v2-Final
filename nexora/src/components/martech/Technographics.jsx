@@ -268,7 +268,6 @@ const Technographics = () => {
               <th>Technology</th>
               <th>Previous Detected Date</th>
               <th>Latest Detected Date</th>
-              <th>Renewal Date</th>
             </tr>
           </thead>
           <tbody>
@@ -314,9 +313,6 @@ const Technographics = () => {
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.latestDetectedDate)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.latestDetectedDate, searchTerm)}
-                  </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.renewalDate)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.renewalDate, searchTerm)}
                   </td>
                 </tr>
               );
@@ -418,7 +414,6 @@ const Technographics = () => {
         th:nth-child(6), td:nth-child(6) { width: 150px; } /* Technology */
         th:nth-child(7), td:nth-child(7) { width: 140px; } /* Previous Detected Date */
         th:nth-child(8), td:nth-child(8) { width: 140px; } /* Latest Detected Date */
-        th:nth-child(9), td:nth-child(9) { width: 120px; } /* Renewal Date */
         
         th {
           background-color: #f8f9fa;
