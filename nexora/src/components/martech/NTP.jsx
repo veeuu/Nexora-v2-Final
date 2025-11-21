@@ -111,7 +111,7 @@ const NTP = () => {
   return (
     <div className="ntp-container">
       <div className="header-actions">
-        <h2>NTP</h2>
+        <h2>NTP®</h2>
         <div className="actions-right">
           <div className="search-bar">
             <input 
