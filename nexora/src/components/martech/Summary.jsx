@@ -1035,8 +1035,8 @@ const Summary = () => {
         },
         summaryPie: {
             display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
+            alignItems: 'center',
+            justifyContent: 'center',
             gap: '30px',
             padding: '10px',
             minHeight: '300px',
@@ -1056,16 +1056,18 @@ const Summary = () => {
             height: `${PIE_RADIUS * 2}px`,
             borderRadius: '50%',
             position: 'absolute',
-            top: PIE_CENTER - PIE_RADIUS,
-            left: PIE_CENTER - PIE_RADIUS,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             transition: 'all 0.1s ease-in-out',
             border: '2px solid white',
             boxShadow: '0 0 5px rgba(0,0,0,0.1)',
         },
         pieOverlay: {
             position: 'absolute',
-            top: PIE_CENTER - PIE_RADIUS,
-            left: PIE_CENTER - PIE_RADIUS,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             width: `${PIE_RADIUS * 2}px`,
             height: `${PIE_RADIUS * 2}px`,
             borderRadius: '50%',
@@ -1390,30 +1392,7 @@ const Summary = () => {
                             </div>
                         </div>
 
-                        {/* LEGEND SECTION */}
-                        <ul style={styles.summaryLegend}>
-                            {overallIndustryPieData.map((item, index) => {
-                                const isHovered = item.label === hoveredPieData?.label;
-                                return (
-                                    <li
-                                        key={item.label}
-                                        style={{
-                                            ...styles.legendItem,
-                                            fontWeight: isHovered ? '700' : '400',
-                                            color: isHovered ? '#1f2937' : '#4b5563',
-                                            backgroundColor: isHovered ? '#f9fafb' : 'transparent',
-                                            borderRadius: '4px',
-                                        }}
-                                        onMouseEnter={() => setHoveredPieData({ ...item, percentage: ((item.value / totalValue) * 100).toFixed(0) })}
-                                        onMouseLeave={() => setHoveredPieData(null)}
-                                    >
-                                        <div style={styles.dot(getSegmentColor(item, isHovered))} />
-                                        <span style={styles.label}>{item.label}</span>
-                                        <span style={styles.value}>{item.value}</span>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+
 
                         {/* TOOLTIP (Conditional rendering based on hoveredPieData) */}
                         {hoveredPieData && (

@@ -113,7 +113,6 @@ body {
   background-color: #fff;
 }
 
-/* ========== DASHBOARD CONTENT ========== */
 .dashboard-content {
   display: flex;
   flex: 1;
@@ -123,7 +122,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ========== MENU ========== */
 .menu {
   width: 250px;
   background-color: #fff;
@@ -355,7 +353,7 @@ th {
 
 .table-container table thead tr:first-child th {
   background-color: #eef2ff;
-  text-align: center;
+  text-align: left;
   font-weight: 600;
   border-bottom: 1px solid #dbeafe;
   top: 0;

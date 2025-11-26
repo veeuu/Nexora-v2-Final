@@ -95,11 +95,12 @@ const RenewalIntelligence = () => {
     const getChartData = () => {
         const qtrCounts = {};
         const colors = {
-            'Q1 2025': '#3b82f6',
-            'Q2 2025': '#1e3a8a',
-            'Q3 2025': '#bb4219ff',
-            'Q4 2025': '#7c3aed',
-            'Q1 2026': '#0f172a'
+            'Q1 2025': '#06b6d4',
+            'Q2 2025': '#00432cff',
+            'Q3 2025': '#f59e0b',
+            'Q4 2025': '#4497efff',
+            'Q1 2026': '#8b5cf6',
+            'Q2 2026': '#001f3f9f'
         };
 
         filteredData.forEach(row => {
@@ -429,8 +430,7 @@ const RenewalIntelligence = () => {
 
                 .table-container {
                     height: 400px;
-                    /* remove horizontal scroll and keep vertical scroll only */
-                    overflow-x: hidden;
+                    overflow-x: auto;
                     overflow-y: auto;
                     position: relative;
                     border: 1px solid #e5e7eb;
@@ -454,7 +454,7 @@ const RenewalIntelligence = () => {
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    table-layout: fixed;
+                    table-layout: auto;
                     min-width: 0;
                     box-sizing: border-box;
                 }
@@ -472,9 +472,9 @@ const RenewalIntelligence = () => {
                 }
 
                 /* Explicitly enforce column width constraints so Renewal QTR is visible */
-                td:nth-child(1), th:nth-child(1) { width: 20%; }
-                td:nth-child(2), th:nth-child(2) { width: 40%; }
-                td:nth-child(3), th:nth-child(3) { width: 40%; }
+                td:nth-child(1), th:nth-child(1) { width: 35%; }
+                td:nth-child(2), th:nth-child(2) { width: 35%; }
+                td:nth-child(3), th:nth-child(3) { width: 30%; }
 
                 td {
                     position: relative;
