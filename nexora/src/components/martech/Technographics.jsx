@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { useIndustry } from '../../context/IndustryContext';
 
 const Technographics = () => {
@@ -14,6 +15,8 @@ const Technographics = () => {
     category: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [ntpData, setNtpData] = useState([]);
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -51,6 +54,13 @@ const Technographics = () => {
         }
         const data = await response.json();
         setTableData(data);
+
+        // Fetch NTP data
+        const ntpResponse = await fetch('/api/ntp');
+        if (ntpResponse.ok) {
+          const ntpDataFetched = await ntpResponse.json();
+          setNtpData(ntpDataFetched);
+        }
 
         // Calculate industry counts from the table data
         const industryCounts = {};
@@ -118,6 +128,17 @@ const Technographics = () => {
     if (!tableData) return [];
     const allValues = tableData.map(item => item[key]);
     return [...new Set(allValues)].sort();
+  };
+
+  const getNtpDataForCompany = (companyName) => {
+    let data = ntpData.filter(row => row.companyName === companyName);
+    
+    // Filter by selected category if one is chosen
+    if (filters.category) {
+      data = data.filter(row => row.category === filters.category);
+    }
+    
+    return data;
   };
 
   // Helper function to check if a row matches search term
@@ -264,10 +285,10 @@ const Technographics = () => {
               <th>Domain</th>
               <th>Industry</th>
               <th>Region</th>
-              <th>Category</th>
+              {/* <th>Category</th> */}
               <th>Technology</th>
-              <th>Previous Detected Date</th>
-              <th>Latest Detected Date</th>
+              {/* <th>Previous Detected Date</th> */}
+              {/* <th>Latest Detected Date</th> */}
             </tr>
           </thead>
           <tbody>
@@ -288,9 +309,25 @@ const Technographics = () => {
                 setTooltip({ show: false, text: '', x: 0, y: 0 });
               };
 
+              const handleCompanyNameMouseEnter = (e, companyName) => {
+                const rect = e.target.getBoundingClientRect();
+                setTooltip({
+                  show: true,
+                  text: companyName,
+                  hint: 'Click to view NTP Analysis',
+                  x: rect.right - 20,
+                  y: rect.bottom + 20,
+                  isCompanyName: true
+                });
+              };
+
               return (
-                <tr key={index} style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent' }}>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                <tr 
+                  key={index} 
+                  style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent', cursor: 'pointer' }}
+                  onClick={() => setSelectedCompany(row.companyName)}
+                >
+                  <td onMouseEnter={(e) => handleCompanyNameMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.companyName, searchTerm)}
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
@@ -302,18 +339,18 @@ const Technographics = () => {
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.region)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.region, searchTerm)}
                   </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
+                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.category, searchTerm)}
-                  </td>
+                  </td> */}
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.technology)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.technology, searchTerm)}
                   </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.previousDetectedDate)} onMouseLeave={handleMouseLeave}>
+                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.previousDetectedDate)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.previousDetectedDate, searchTerm)}
-                  </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.latestDetectedDate)} onMouseLeave={handleMouseLeave}>
+                  </td> */}
+                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.latestDetectedDate)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.latestDetectedDate, searchTerm)}
-                  </td>
+                  </td> */}
                 </tr>
               );
             })}
@@ -331,9 +368,9 @@ const Technographics = () => {
             transform: 'translate(-50%, -100%)',
             backgroundColor: '#ffffffff',
             color: 'black',
-            padding: '8px 12px',
+            padding: tooltip.isCompanyName ? '10px 12px' : '8px 12px',
             borderRadius: '6px',
-            fontSize: '13px',
+            fontSize: tooltip.isCompanyName ? '13px' : '13px',
             fontWeight: '500',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             zIndex: 1000,
@@ -344,7 +381,14 @@ const Technographics = () => {
             lineHeight: '1.4'
           }}
         >
-          {tooltip.text}
+          <div style={{ fontWeight: '600', marginBottom: tooltip.hint ? '6px' : '0' }}>
+            {tooltip.text}
+          </div>
+          {tooltip.hint && (
+            <div style={{ fontSize: '11px', color: 'rgb(0, 102, 204)', fontWeight: '400', fontStyle: 'italic' }}>
+              💡 {tooltip.hint}
+            </div>
+          )}
           <div
             style={{
               position: 'absolute',
@@ -360,7 +404,109 @@ const Technographics = () => {
         </div>
       )}
 
+      {/* Side Panel for NTP Details */}
+      {selectedCompany && (
+        <>
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              zIndex: 999
+            }}
+            onClick={() => setSelectedCompany(null)}
+          />
+          <div 
+            style={{
+              position: 'fixed',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '500px',
+              backgroundColor: 'white',
+              boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.15)',
+              zIndex: 1000,
+              overflowY: 'auto',
+              animation: 'slideIn 0.3s ease-out'
+            }}
+          >
+            <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, color: '#010810' }}>{selectedCompany}</h3>
+                <button
+                  onClick={() => setSelectedCompany(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div style={{ padding: '20px' }}>
+              {getNtpDataForCompany(selectedCompany).length > 0 ? (
+                <div>
+                  <h4 style={{ marginTop: 0, color: '#010810', marginBottom: '15px' }}>Technologies & Purchase Probability</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    {getNtpDataForCompany(selectedCompany).map((item, idx) => (
+                      <div 
+                        key={idx}
+                        style={{
+                          padding: '12px',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          backgroundColor: '#f9fafb'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                          <div>
+                            <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#010810' }}>{item.technology}</p>
+                            <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>{item.category}</p>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0066cc' }}>{item.purchaseProbability}%</p>
+                            <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#666' }}>Probability</p>
+                          </div>
+                        </div>
+                        <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#666' }}>
+                          <strong>Prediction:</strong> {item.purchasePrediction}
+                        </p>
+                        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #e5e7eb' }}>
+                          <p style={{ margin: '0 0 4px 0', fontSize: '11px', fontWeight: '600', color: '#010810' }}>NTP Analysis:</p>
+                          <p style={{ margin: '0', fontSize: '12px', color: '#555', lineHeight: '1.5' }}>
+                            {item.ntpAnalysis || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center', padding: '20px 0' }}>No NTP data available</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
       <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+
         .table-container {
           max-height: 400px;
           overflow-x: auto;
@@ -410,10 +556,10 @@ const Technographics = () => {
         th:nth-child(2), td:nth-child(2) { width: 180px; } /* Domain */
         th:nth-child(3), td:nth-child(3) { width: 150px; } /* Industry */
         th:nth-child(4), td:nth-child(4) { width: 120px; } /* Region */
-        th:nth-child(5), td:nth-child(5) { width: 150px; } /* Category */
-        th:nth-child(6), td:nth-child(6) { width: 150px; } /* Technology */
-        th:nth-child(7), td:nth-child(7) { width: 140px; } /* Previous Detected Date */
-        th:nth-child(8), td:nth-child(8) { width: 140px; } /* Latest Detected Date */
+        th:nth-child(5), td:nth-child(5) { width: 150px; } /* Technology */
+        {/* th:nth-child(6), td:nth-child(6) { width: 150px; } Category - COMMENTED OUT */}
+        {/* th:nth-child(7), td:nth-child(7) { width: 140px; } Previous Detected Date - COMMENTED OUT */}
+        {/* th:nth-child(8), td:nth-child(8) { width: 140px; } Latest Detected Date - COMMENTED OUT */}
         
         th {
           background-color: #f8f9fa;
@@ -423,7 +569,7 @@ const Technographics = () => {
         tr:hover {
           background-color: #f5f5f5;
         }
-      `}</style>l
+      `}</style>
     </div>
   );
 };
