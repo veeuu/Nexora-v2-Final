@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IndustryProvider } from '../context/IndustryContext';
 import Header from './Header';
 import Menu from './Menu';
@@ -16,7 +16,7 @@ import BuyerGroup from './market/BuyerGroup';
 import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = ({ onLogout, onNavRef }) => {
   const [activeView, setActiveView] = useState('Martech');
   const [activeSection, setActiveSection] = useState('Summary');
 
@@ -28,6 +28,34 @@ const Dashboard = ({ onLogout }) => {
   const handleMenuClick = (section) => {
     setActiveSection(section);
   };
+
+  const handleChatbotNavigation = (page) => {
+    if (!page) return;
+    
+    const sectionMap = {
+      'Intent': 'Intent',
+      'Technographics': 'Technographics',
+      'NTP': 'NTP®',
+      'Buying Group': 'Buying Group',
+      'Renewal Intelligence': 'Renewal Intelligence',
+      'Summary': 'Summary',
+      'Financial': 'Financial',
+      'Stock Performance': 'Stock Performance',
+      'Buyer Group': 'Buyer Group'
+    };
+
+    const view = ['Intent', 'Technographics', 'NTP', 'Buying Group', 'Renewal Intelligence'].includes(page.page) ? 'Martech' : 'Market';
+    const section = sectionMap[page.page] || 'Summary';
+
+    setActiveView(view);
+    setActiveSection(section);
+  };
+
+  useEffect(() => {
+    if (onNavRef) {
+      onNavRef(handleChatbotNavigation);
+    }
+  }, [onNavRef]);
 
   const getMenuItems = () => {
     return activeView === 'Martech'
