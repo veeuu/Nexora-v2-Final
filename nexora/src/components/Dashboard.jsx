@@ -8,6 +8,7 @@ import Martechintent from './martech/Intent';
 import MartechTechnographics from './martech/Technographics';
 import RenewalIntelligence from './martech/RenewalIntelligence';
 import MartechBuyingGroup from './martech/BuyingGroup';
+import ProductCatalogue from './martech/ProductCatalogue';
 import MarketSummary from './market/Summary';
 // import MarketNTP from './market/NTP'; // Commented out as requested
 import MarketFinancial from './market/Financial';
@@ -59,7 +60,7 @@ const Dashboard = ({ onLogout, onNavRef }) => {
 
   const getMenuItems = () => {
     return activeView === 'Martech'
-      ? ['Insights Panel', 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group', 'NTP®']
+      ? ['Insights Panel', 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group', 'NTP®', 'Product Catalogue']
       : ['Summary', /* 'NTP', */ 'Financial', 'Stock Performance', 'Buyer Group', 'Growth', 'Mutual Fund']; // Added 'Mutual Fund' to the menu
   };
 
@@ -79,6 +80,8 @@ const Dashboard = ({ onLogout, onNavRef }) => {
           return <RenewalIntelligence />;
         case 'Buying Group':
           return <MartechBuyingGroup />;
+        case 'Product Catalogue':
+          return <ProductCatalogue />;
         default:
           return <MartechSummary />;
       }

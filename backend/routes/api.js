@@ -452,5 +452,27 @@ router.get('/renewal-intelligence', async (req, res) => {
   }
 });
 
+// @route   GET /api/product-catalogue
+// @desc    Get Product Catalogue data
+// @access  Public
+router.get('/product-catalogue', async (req, res) => {
+  try {
+    const productCatalogueCollection = mongoose.connection.db.collection('product_catalogue');
+    const productDocs = await productCatalogueCollection.find({}).toArray();
+
+    const productData = productDocs.map(item => ({
+      prodName: item['Product Name'] || item.prodName || 'N/A',
+      category: item.Category || item.category || 'N/A',
+      subCategory: item['Sub Category'] || item.subCategory || 'N/A',
+      description: item.Description || item.description || 'N/A'
+    }));
+
+    res.json(productData);
+  } catch (err) {
+    console.error('Error fetching product catalogue data:', err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 
 module.exports = router;
