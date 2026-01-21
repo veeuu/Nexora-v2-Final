@@ -1,6 +1,67 @@
 import { useState, useEffect } from 'react';
-import React from 'react';
 import { useIndustry } from '../../context/IndustryContext';
+
+const Speedometer = ({ value }) => {
+  // Parse the value to get just the number
+  const numValue = parseInt(value) || 0;
+  const clampedValue = Math.min(Math.max(numValue, 0), 100);
+  
+  // Calculate rotation based on 5 zones (180 degree arc):
+  let rotation;
+  if (clampedValue <= 20) {
+    rotation = -90;
+  } else if (clampedValue <= 40) {
+    rotation = -45;
+  } else if (clampedValue <= 60) {
+    rotation = 0;
+  } else if (clampedValue <= 80) {
+    rotation = 45;
+  } else {
+    rotation = 90;
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+      <div style={{ position: 'relative', width: '50px', height: '28px' }}>
+        <svg width="50" height="28" viewBox="0 0 100 55" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <defs>
+            {/* Gradient for smooth color transition */}
+            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ef4444" />
+              <stop offset="20%" stopColor="#f97316" />
+              <stop offset="40%" stopColor="#fbbf24" />
+              <stop offset="60%" stopColor="#86efac" />
+              <stop offset="100%" stopColor="#10b981" />
+            </linearGradient>
+          </defs>
+          
+          {/* Single smooth gradient arc - inner position */}
+          <path
+            d="M 8 50 A 45 45 0 0 1 92 50"
+            fill="none"
+            stroke="url(#gaugeGradient)"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          
+          {/* Black needle - smaller and inside the gauge */}
+          <g style={{ transform: `rotate(${rotation}deg)`, transformOrigin: '50px 50px', transition: 'transform 0.3s ease' }}>
+            <line x1="50" y1="50" x2="50" y2="20" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="50" cy="50" r="2" fill="#000000" />
+          </g>
+          
+          {/* Center pointer dot - smaller */}
+          <circle cx="50" cy="50" r="3.5" fill="#ffffff" stroke="#000000" strokeWidth="1.5" />
+        </svg>
+      </div>
+      
+      {/* Percentage value below the chart */}
+      <div style={{ fontSize: '12px', fontWeight: '700', color: '#1f2937' }}>
+        {clampedValue}%
+      </div>
+    </div>
+  );
+};
 
 const Technographics = () => {
   const [tableData, setTableData] = useState([]);
@@ -466,14 +527,13 @@ const Technographics = () => {
                           backgroundColor: '#f9fafb'
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
-                          <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '12px' }}>
+                          <div style={{ flex: 1 }}>
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#010810' }}>{item.technology}</p>
                             <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>{item.category}</p>
                           </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0066cc' }}>{item.purchaseProbability}</p>
-                            <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#666' }}>Probability</p>
+                          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                            <Speedometer value={item.purchaseProbability} />
                           </div>
                         </div>
                         <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#666' }}>
