@@ -116,7 +116,7 @@ const NTP = () => {
           <div className="search-bar">
             <input 
               type="text" 
-              placeholder="Search..." 
+              placeholder="Search by Company Name" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -193,7 +193,7 @@ const NTP = () => {
               <th>Domain</th> {/* Domain column remains */}
               <th>Category</th>
               <th>Technology</th>
-              <th>Purchase Probability (%)</th>
+              <th>Purchase Propensity (%)</th>
               <th>Purchase Prediction</th>
               <th>NTP Analysis</th>
             </tr>

@@ -5,6 +5,7 @@ const ProductCatalogue = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedYear, setSelectedYear] = useState('2025');
   const [filters, setFilters] = useState({
     prodName: '',
     category: '',
@@ -16,6 +17,10 @@ const ProductCatalogue = () => {
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
+  };
+
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
   };
 
   const handleDownloadCSV = () => {
@@ -34,7 +39,7 @@ const ProductCatalogue = () => {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'product_catalogue.csv');
+    link.setAttribute('download', `product_catalogue_${selectedYear}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -45,7 +50,7 @@ const ProductCatalogue = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/product-catalogue');
+        const response = await fetch(`/api/product-catalogue?year=${selectedYear}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -60,7 +65,7 @@ const ProductCatalogue = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedYear]);
 
   const getUniqueOptions = (key) => {
     if (!tableData) return [];
@@ -105,13 +110,13 @@ const ProductCatalogue = () => {
 
   return (
     <div className="product-catalogue-container">
+      <h2>Product Catalogue</h2>
       <div className="header-actions">
-        <h2>Product Catalogue</h2>
-        <div className="actions-right">
+        <div className="actions-left">
           <div className="search-bar">
             <input 
               type="text" 
-              placeholder="Search..." 
+              placeholder="Search by Product Name" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -120,6 +125,19 @@ const ProductCatalogue = () => {
           <button className="download-csv-button" onClick={handleDownloadCSV}>
             Download CSV
           </button>
+        </div>
+        <div className="actions-right">
+          <div className="year-dropdown">
+            <label className="year-label">Year :</label>
+            <select 
+              value={selectedYear}
+              onChange={(e) => handleYearChange(e.target.value)}
+              className="year-select"
+            >
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+            </select>
+          </div>
         </div>
       </div>
       <div className="section-subtle-divider" />
@@ -215,6 +233,120 @@ const ProductCatalogue = () => {
       )}
 
       <style jsx>{`
+        h2 {
+          margin: 0 0 15px 0;
+        }
+
+        .header-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+          gap: 15px;
+        }
+
+        .actions-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .actions-right {
+          display: flex;
+          gap: 15px;
+          align-items: center;
+        }
+
+        .search-bar {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-bar input {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          width: 220px;
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 10px;
+          cursor: pointer;
+        }
+
+        .year-dropdown {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .year-label {
+          font-weight: 600;
+          font-size: 14px;
+          margin: 0;
+        }
+
+        .year-select {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background-color: white;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .year-select:hover {
+          border-color: #999;
+        }
+
+        .download-csv-button {
+          padding: 8px 16px;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .download-csv-button:hover {
+          background-color: #4CAF50;
+        }
+
+        .section-subtle-divider {
+          height: 1px;
+          background-color: #e0e0e0;
+          margin-bottom: 20px;
+        }
+
+        .filters {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .filter-group label {
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .filter-group select {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background-color: white;
+          cursor: pointer;
+        }
+
         .table-container {
           max-height: 400px;
           overflow-x: auto;

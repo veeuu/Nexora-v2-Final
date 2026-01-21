@@ -453,11 +453,14 @@ router.get('/renewal-intelligence', async (req, res) => {
 });
 
 // @route   GET /api/product-catalogue
-// @desc    Get Product Catalogue data
+// @desc    Get Product Catalogue data by year
 // @access  Public
 router.get('/product-catalogue', async (req, res) => {
   try {
-    const productCatalogueCollection = mongoose.connection.db.collection('product_catalogue');
+    const { year } = req.query;
+    const collectionName = year === '2026' ? 'product_catalogue_2026' : 'product_catalogue';
+    
+    const productCatalogueCollection = mongoose.connection.db.collection(collectionName);
     const productDocs = await productCatalogueCollection.find({}).toArray();
 
     const productData = productDocs.map(item => ({

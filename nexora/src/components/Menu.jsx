@@ -38,7 +38,7 @@ const Menu = ({ activeSection, onMenuClick, menuItems, onLogout }) => {
           <span></span>
           <span></span>
         </div>
-        <span>Menu</span>
+        <span>Solutions</span>
       </div>
       <ul className={`menu-items ${isOpen ? 'open' : ''}`}>
         {menuItems.map((item) => (

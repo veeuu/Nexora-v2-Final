@@ -213,7 +213,7 @@ const Technographics = () => {
           <div className="search-bar">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search by Company Name"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -472,7 +472,7 @@ const Technographics = () => {
                             <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>{item.category}</p>
                           </div>
                           <div style={{ textAlign: 'right' }}>
-                            <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0066cc' }}>{item.purchaseProbability}%</p>
+                            <p style={{ margin: '0', fontSize: '18px', fontWeight: '700', color: '#0066cc' }}>{item.purchaseProbability}</p>
                             <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#666' }}>Probability</p>
                           </div>
                         </div>

@@ -20,6 +20,7 @@ import MutualFund from './market/MutualFund'; // Added import for MutualFund
 const Dashboard = ({ onLogout, onNavRef }) => {
   const [activeView, setActiveView] = useState('Martech');
   const [activeSection, setActiveSection] = useState('Summary');
+  const [selectedRegion, setSelectedRegion] = useState('');
 
   const handleDropdownChange = (value) => {
     setActiveView(value);
@@ -28,6 +29,10 @@ const Dashboard = ({ onLogout, onNavRef }) => {
 
   const handleMenuClick = (section) => {
     setActiveSection(section);
+  };
+
+  const handleRegionChange = (region) => {
+    setSelectedRegion(region);
   };
 
   const handleChatbotNavigation = (page) => {
@@ -60,7 +65,7 @@ const Dashboard = ({ onLogout, onNavRef }) => {
 
   const getMenuItems = () => {
     return activeView === 'Martech'
-      ? ['Insights Panel', 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group', 'NTP®', 'Product Catalogue']
+      ? [/* 'Insights Panel', */ 'Technographics', 'Renewal Intelligence', 'Intent', 'Buying Group', 'NTP®', 'Product Catalogue']
       : ['Summary', /* 'NTP', */ 'Financial', 'Stock Performance', 'Buyer Group', 'Growth', 'Mutual Fund']; // Added 'Mutual Fund' to the menu
   };
 
@@ -71,7 +76,7 @@ const Dashboard = ({ onLogout, onNavRef }) => {
           return <MartechSummary />;
         case 'NTP':
         case 'NTP®':
-          return <MartechNTP />;
+          return <MartechNTP selectedRegion={selectedRegion} />;
         case 'Intent':
           return <Martechintent />;
         case 'Technographics':
@@ -110,7 +115,7 @@ const Dashboard = ({ onLogout, onNavRef }) => {
   return (
     <IndustryProvider>
       <div className="dashboard">
-        <Header onDropdownChange={handleDropdownChange} />
+        <Header onDropdownChange={handleDropdownChange} onRegionChange={handleRegionChange} />
         <div className="dashboard-content">
           <Menu
             activeSection={activeSection}

@@ -112,7 +112,7 @@ const Intent = () => {
           <div className="search-bar">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search by Company Name"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
