@@ -197,7 +197,7 @@ const RenewalIntelligence = () => {
                 </div>
 
                 <div className="filter-group">
-                    <label>Renewals</label>
+                    <label>Renewal Timelines</label>
                     <select
                         value={filters.qtr}
                         onChange={(e) => handleFilterChange('qtr', e.target.value)}
