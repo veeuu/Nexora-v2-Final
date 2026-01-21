@@ -1,4 +1,191 @@
 import { useState, useEffect } from 'react';
+import * as SiIcons from 'react-icons/si';
+
+// Generic Custom Dropdown Component (without icons)
+const CustomDropdown = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        <span>{value || 'All'}</span>
+        <span style={{ fontSize: '12px' }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value === '' ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
+          >
+            All
+          </div>
+          {options.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value === option ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Custom Dropdown Component with Icons for Products
+const CustomProductDropdown = ({ value, onChange, options, renderIcon }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          justifyContent: 'space-between'
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {value && renderIcon(value)}
+          {value || 'All'}
+        </span>
+        <span style={{ fontSize: '12px' }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value === '' ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
+          >
+            All
+          </div>
+          {options.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value === option ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
+            >
+              {renderIcon(option)}
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const RenewalIntelligence = () => {
     const [filters, setFilters] = useState({
@@ -9,6 +196,101 @@ const RenewalIntelligence = () => {
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+
+    // Icon mapping for products
+    const getProductIcon = (productName) => {
+        if (!productName) return null;
+        
+        const productLower = productName.toLowerCase();
+        
+        // Check for SAP or VMware anywhere in the name (priority check)
+        if (productLower.includes('sap')) {
+            return 'SiSap';
+        }
+        if (productLower.includes('vmware')) {
+            return 'SiVmware';
+        }
+        
+        // Map product names to react-icons component names
+        const iconMap = {
+            'aws': 'SiAmazonaws',
+            'amazon': 'SiAmazonaws',
+            'azure': 'SiMicrosoftazure',
+            'microsoft': 'SiMicrosoft',
+            'google cloud': 'SiGooglecloud',
+            'gcp': 'SiGooglecloud',
+            'docker': 'SiDocker',
+            'kubernetes': 'SiKubernetes',
+            'jenkins': 'SiJenkins',
+            'git': 'SiGit',
+            'github': 'SiGithub',
+            'gitlab': 'SiGitlab',
+            'python': 'SiPython',
+            'java': 'SiJava',
+            'javascript': 'SiJavascript',
+            'react': 'SiReact',
+            'nodejs': 'SiNodedotjs',
+            'node.js': 'SiNodedotjs',
+            'mongodb': 'SiMongodb',
+            'postgresql': 'SiPostgresql',
+            'mysql': 'SiMysql',
+            'redis': 'SiRedis',
+            'elasticsearch': 'SiElasticsearch',
+            'kafka': 'SiApachekafka',
+            'spark': 'SiApachespark',
+            'hadoop': 'SiApachehadoop',
+            'tensorflow': 'SiTensorflow',
+            'pytorch': 'SiPytorch',
+            'ai': 'SiOpenai',
+            'ml': 'SiTensorflow',
+            'machine learning': 'SiTensorflow',
+            'salesforce': 'SiSalesforce',
+            'oracle': 'SiOracle',
+            'linux': 'SiLinux',
+            'windows': 'SiWindows',
+            'macos': 'SiApple',
+            'ios': 'SiApple',
+            'android': 'SiAndroid',
+            'nginx': 'SiNginx',
+            'apache': 'SiApache',
+            'tomcat': 'SiApachetomcat',
+            'esxi': 'SiVmware',
+            'esx': 'SiVmware',
+            'aria': 'SiVmware',
+            'horizon': 'SiVmware',
+            'nsx': 'SiVmware',
+            'carbon black': 'SiVmware',
+            'generative ai': 'SiOpenai',
+            'ai / cloud + ai': 'SiOpenai',
+            'oracle cloud': 'SiOracle',
+            'oracle erp': 'SiOracle',
+            'oracle cloud applications': 'SiOracle'
+        };
+        
+        const iconName = iconMap[productLower];
+        return iconName;
+    };
+
+    // Render icon component
+    const renderProductIcon = (productName) => {
+        const iconName = getProductIcon(productName);
+        if (!iconName) return null;
+        
+        const IconComponent = SiIcons[iconName];
+        if (!IconComponent) return null;
+        
+        return (
+            <IconComponent
+                size={16}
+                style={{
+                    marginRight: '6px',
+                    display: 'inline-block',
+                    verticalAlign: 'middle'
+                }}
+                title={productName}
+            />
+        );
+    };
 
     // Fetch renewal data when company is selected
     useEffect(() => {
@@ -168,47 +450,30 @@ const RenewalIntelligence = () => {
             <div className="filters">
                 <div className="filter-group">
                     <label>Account Name</label>
-                    <select
+                    <CustomDropdown
                         value={filters.companyName}
-                        onChange={(e) => handleFilterChange('companyName', e.target.value)}
-                    >
-                        <option value="">All</option>
-                        {getUniqueCompanies().map(company => (
-                            <option key={company} value={company}>
-                                {company}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={(value) => handleFilterChange('companyName', value)}
+                        options={getUniqueCompanies()}
+                    />
                 </div>
 
                 <div className="filter-group">
                     <label>Product</label>
-                    <select
+                    <CustomProductDropdown
                         value={filters.product}
-                        onChange={(e) => handleFilterChange('product', e.target.value)}
-                    >
-                        <option value="">All</option>
-                        {getUniqueProducts().map(product => (
-                            <option key={product} value={product}>
-                                {product}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={(value) => handleFilterChange('product', value)}
+                        options={getUniqueProducts()}
+                        renderIcon={renderProductIcon}
+                    />
                 </div>
 
                 <div className="filter-group">
                     <label>Renewal Timelines</label>
-                    <select
+                    <CustomDropdown
                         value={filters.qtr}
-                        onChange={(e) => handleFilterChange('qtr', e.target.value)}
-                    >
-                        <option value="">All</option>
-                        {getUniqueQtrs().map(qtr => (
-                            <option key={qtr} value={qtr}>
-                                {qtr}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={(value) => handleFilterChange('qtr', value)}
+                        options={getUniqueQtrs()}
+                    />
                 </div>
             </div>
 
@@ -262,7 +527,10 @@ const RenewalIntelligence = () => {
                                                     y: rect.bottom + 20
                                                 });
                                             }} onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}>
-                                                {row.product}
+                                                <span style={{ display: 'flex', alignItems: 'center' }}>
+                                                    {renderProductIcon(row.product)}
+                                                    {row.product}
+                                                </span>
                                             </td>
                                             <td onMouseEnter={(e) => {
                                                 const rect = e.target.getBoundingClientRect();

@@ -1,5 +1,192 @@
 import React, { useState, useEffect } from 'react';
 import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
+import * as SiIcons from 'react-icons/si';
+
+// Generic Custom Dropdown Component (without icons)
+const CustomDropdown = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        <span>{value || 'All'}</span>
+        <span style={{ fontSize: '12px' }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value === '' ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
+          >
+            All
+          </div>
+          {options.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value === option ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Custom Dropdown Component with Icons for Technology/Category
+const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          justifyContent: 'space-between'
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {value && renderIcon(value)}
+          {value || 'All'}
+        </span>
+        <span style={{ fontSize: '12px' }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value === '' ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
+          >
+            All
+          </div>
+          {options.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value === option ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
+            >
+              {renderIcon(option)}
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const NTP = () => {
   const [tableData, setTableData] = useState([]);
@@ -14,6 +201,101 @@ const NTP = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [modalContent, setModalContent] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+
+  // Icon mapping for technologies and categories
+  const getTechIcon = (techName) => {
+    if (!techName) return null;
+    
+    const techLower = techName.toLowerCase();
+    
+    // Check for SAP or VMware anywhere in the name (priority check)
+    if (techLower.includes('sap')) {
+      return 'SiSap';
+    }
+    if (techLower.includes('vmware')) {
+      return 'SiVmware';
+    }
+    
+    // Map technology names to react-icons component names
+    const iconMap = {
+      'aws': 'SiAmazonaws',
+      'amazon': 'SiAmazonaws',
+      'azure': 'SiMicrosoftazure',
+      'microsoft': 'SiMicrosoft',
+      'google cloud': 'SiGooglecloud',
+      'gcp': 'SiGooglecloud',
+      'docker': 'SiDocker',
+      'kubernetes': 'SiKubernetes',
+      'jenkins': 'SiJenkins',
+      'git': 'SiGit',
+      'github': 'SiGithub',
+      'gitlab': 'SiGitlab',
+      'python': 'SiPython',
+      'java': 'SiJava',
+      'javascript': 'SiJavascript',
+      'react': 'SiReact',
+      'nodejs': 'SiNodedotjs',
+      'node.js': 'SiNodedotjs',
+      'mongodb': 'SiMongodb',
+      'postgresql': 'SiPostgresql',
+      'mysql': 'SiMysql',
+      'redis': 'SiRedis',
+      'elasticsearch': 'SiElasticsearch',
+      'kafka': 'SiApachekafka',
+      'spark': 'SiApachespark',
+      'hadoop': 'SiApachehadoop',
+      'tensorflow': 'SiTensorflow',
+      'pytorch': 'SiPytorch',
+      'ai': 'SiOpenai',
+      'ml': 'SiTensorflow',
+      'machine learning': 'SiTensorflow',
+      'salesforce': 'SiSalesforce',
+      'oracle': 'SiOracle',
+      'linux': 'SiLinux',
+      'windows': 'SiWindows',
+      'macos': 'SiApple',
+      'ios': 'SiApple',
+      'android': 'SiAndroid',
+      'nginx': 'SiNginx',
+      'apache': 'SiApache',
+      'tomcat': 'SiApachetomcat',
+      'esxi': 'SiVmware',
+      'esx': 'SiVmware',
+      'aria': 'SiVmware',
+      'horizon': 'SiVmware',
+      'nsx': 'SiVmware',
+      'carbon black': 'SiVmware',
+      'generative ai': 'SiOpenai',
+      'ai / cloud + ai': 'SiOpenai',
+      'oracle cloud': 'SiOracle',
+      'oracle erp': 'SiOracle',
+      'oracle cloud applications': 'SiOracle'
+    };
+    
+    const iconName = iconMap[techLower];
+    return iconName;
+  };
+
+  // Render icon component
+  const renderTechIcon = (techName) => {
+    const iconName = getTechIcon(techName);
+    if (!iconName) return null;
+    
+    const IconComponent = SiIcons[iconName];
+    if (!IconComponent) return null;
+    
+    return (
+      <IconComponent
+        size={16}
+        style={{
+          marginRight: '6px',
+          display: 'inline-block',
+          verticalAlign: 'middle'
+        }}
+        title={techName}
+      />
+    );
+  };
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -132,55 +414,40 @@ const NTP = () => {
       <div className="filters">
         <div className="filter-group">
           <label>Company Name</label>
-          <select 
+          <CustomDropdown
             value={filters.companyName}
-            onChange={(e) => handleFilterChange('companyName', e.target.value)}
-          >
-            <option value="">All</option>
-            {getUniqueOptions('companyName').map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
+            onChange={(value) => handleFilterChange('companyName', value)}
+            options={getUniqueOptions('companyName')}
+          />
         </div>
-        
         
         <div className="filter-group">
           <label>Purchase Prediction</label>
-          <select 
+          <CustomDropdown
             value={filters.purchasePrediction}
-            onChange={(e) => handleFilterChange('purchasePrediction', e.target.value)}
-          >
-            <option value="">All</option>
-            {getUniqueOptions('purchasePrediction').map(prediction => (
-              <option key={prediction} value={prediction}>{prediction}</option>
-            ))}
-          </select>
+            onChange={(value) => handleFilterChange('purchasePrediction', value)}
+            options={getUniqueOptions('purchasePrediction')}
+          />
         </div>
         
         <div className="filter-group">
           <label>Category</label>
-          <select 
+          <CustomTechDropdown
             value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-          >
-            <option value="">All</option>
-            {getUniqueOptions('category').map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
+            onChange={(value) => handleFilterChange('category', value)}
+            options={getUniqueOptions('category')}
+            renderIcon={renderTechIcon}
+          />
         </div>
 
         <div className="filter-group">
           <label>Technology</label>
-          <select 
+          <CustomTechDropdown
             value={filters.technology}
-            onChange={(e) => handleFilterChange('technology', e.target.value)}
-          >
-            <option value="">All</option>
-            {getUniqueOptions('technology').map(tech => (
-              <option key={tech} value={tech}>{tech}</option>
-            ))}
-          </select>
+            onChange={(value) => handleFilterChange('technology', value)}
+            options={getUniqueOptions('technology')}
+            renderIcon={renderTechIcon}
+          />
         </div>
 
       </div>
@@ -210,10 +477,16 @@ const NTP = () => {
                     {highlightText(row.domain, searchTerm)}
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.category, searchTerm)}
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      {renderTechIcon(row.category)}
+                      {highlightText(row.category, searchTerm)}
+                    </span>
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.technology)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.technology, searchTerm)}
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      {renderTechIcon(row.technology)}
+                      {highlightText(row.technology, searchTerm)}
+                    </span>
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.purchaseProbability)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.purchaseProbability, searchTerm)}
