@@ -104,6 +104,12 @@ const Login = ({ onLogin }) => {
               Sign In
             </button>
 
+            <p style={{ textAlign: 'center', fontSize: '0.875rem', marginTop: '1rem', color: '#666' }}>
+              <a href="https://www.linkedin.com/newsletters/the-proplus-data-newsletter-7419630672841150464/" target="_blank" rel="noopener noreferrer" style={{ color: '#1890ff', textDecoration: 'none', fontWeight: '500', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#40a9ff'} onMouseLeave={(e) => e.target.style.color = '#1890ff'}>
+                Subscribe to our newsletter
+              </a>
+            </p>
+
             {/* <p className="form-signup">
               Don't have an account? <a href="#signup">Sign up</a>
             </p> */}
