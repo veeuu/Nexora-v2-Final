@@ -104,12 +104,12 @@ const Login = ({ onLogin }) => {
               Sign In
             </button>
 
-            <p className="form-signup">
+            {/* <p className="form-signup">
               Don't have an account? <a href="#signup">Sign up</a>
-            </p>
+            </p> */}
           </form>
 
-          <p className="copyright">Copyright 2025 Nexora Corporation</p>
+          <p className="copyright"></p>
         </div>
       </div>
     </div>

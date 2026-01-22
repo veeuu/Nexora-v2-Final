@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import logo from '../assets/Proplus Data Logo - Horizontal Transparent (1).png';
 import nexoraLogo from '../assets/nexora-logo.png';
 
 const Header = ({ onRegionChange, username, onLogout }) => {
@@ -21,8 +20,6 @@ const Header = ({ onRegionChange, username, onLogout }) => {
     <header className="header">
       <div className="header-brand-center">
         <div className="brand">
-          <img src={logo} alt="Proplus Data" className="brand-logo" />
-          <span className="brand-sep">|</span>
           <img src={nexoraLogo} alt="Nexora" className="nexora-logo" />
         </div>
       </div>

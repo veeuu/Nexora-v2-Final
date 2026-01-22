@@ -342,6 +342,8 @@ body {
   list-style: none;
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .menu-items li {
@@ -364,7 +366,41 @@ body {
 }
 
 .menu-footer {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1.5rem 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: auto;
+  position: relative;
+  z-index: 101;
+}
+
+.menu-proplus-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.menu-proplus-link:hover {
+  transform: scale(1.05);
+}
+
+.menu-proplus-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: opacity 0.2s ease;
+  max-width: 90%;
+  padding-bottom: 1rem;
+}
+
+.menu-proplus-logo:hover {
+  opacity: 1;
 }
 
 .sign-out-btn {

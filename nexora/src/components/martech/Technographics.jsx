@@ -1,6 +1,101 @@
 import { useState, useEffect } from 'react';
 import { useIndustry } from '../../context/IndustryContext';
 import * as SiIcons from 'react-icons/si';
+import Flag from 'country-flag-icons/react/3x2';
+
+// Country name to country code mapping
+const countryCodeMap = {
+  'United States': 'US', 'USA': 'US', 'UNITED STATES': 'US',
+  'Canada': 'CA', 'CANADA': 'CA',
+  'United Kingdom': 'GB', 'UK': 'GB', 'UNITED KINGDOM': 'GB',
+  'Germany': 'DE', 'GERMANY': 'DE',
+  'France': 'FR', 'FRANCE': 'FR',
+  'India': 'IN', 'INDIA': 'IN',
+  'Japan': 'JP', 'JAPAN': 'JP',
+  'Australia': 'AU', 'AUSTRALIA': 'AU',
+  'Brazil': 'BR', 'BRAZIL': 'BR',
+  'Mexico': 'MX', 'MEXICO': 'MX',
+  'China': 'CN', 'CHINA': 'CN',
+  'Singapore': 'SG', 'SINGAPORE': 'SG',
+  'South Korea': 'KR', 'KOREA': 'KR', 'SOUTH KOREA': 'KR',
+  'Netherlands': 'NL', 'NETHERLANDS': 'NL',
+  'Sweden': 'SE', 'SWEDEN': 'SE',
+  'Switzerland': 'CH', 'SWITZERLAND': 'CH',
+  'Spain': 'ES', 'SPAIN': 'ES',
+  'Italy': 'IT', 'ITALY': 'IT',
+  'Ireland': 'IE', 'IRELAND': 'IE',
+  'New Zealand': 'NZ', 'NEW ZEALAND': 'NZ',
+  'UAE': 'AE', 'UNITED ARAB EMIRATES': 'AE',
+  'Saudi Arabia': 'SA', 'SAUDI ARABIA': 'SA',
+  'Israel': 'IL', 'ISRAEL': 'IL',
+  'South Africa': 'ZA', 'SOUTH AFRICA': 'ZA',
+  'Russia': 'RU', 'RUSSIA': 'RU',
+  'Poland': 'PL', 'POLAND': 'PL',
+  'Belgium': 'BE', 'BELGIUM': 'BE',
+  'Austria': 'AT', 'AUSTRIA': 'AT',
+  'Denmark': 'DK', 'DENMARK': 'DK',
+  'Norway': 'NO', 'NORWAY': 'NO',
+  'Finland': 'FI', 'FINLAND': 'FI',
+  'Portugal': 'PT', 'PORTUGAL': 'PT',
+  'Greece': 'GR', 'GREECE': 'GR',
+  'Czech Republic': 'CZ', 'CZECHIA': 'CZ',
+  'Hungary': 'HU', 'HUNGARY': 'HU',
+  'Romania': 'RO', 'ROMANIA': 'RO',
+  'Thailand': 'TH', 'THAILAND': 'TH',
+  'Malaysia': 'MY', 'MALAYSIA': 'MY',
+  'Indonesia': 'ID', 'INDONESIA': 'ID',
+  'Philippines': 'PH', 'PHILIPPINES': 'PH',
+  'Vietnam': 'VN', 'VIETNAM': 'VN',
+  'Pakistan': 'PK', 'PAKISTAN': 'PK',
+  'Bangladesh': 'BD', 'BANGLADESH': 'BD',
+  'Argentina': 'AR', 'ARGENTINA': 'AR',
+  'Chile': 'CL', 'CHILE': 'CL',
+  'Colombia': 'CO', 'COLOMBIA': 'CO',
+  'Peru': 'PE', 'PERU': 'PE',
+  'Turkey': 'TR', 'TURKEY': 'TR',
+  'Egypt': 'EG', 'EGYPT': 'EG',
+  'Nigeria': 'NG', 'NIGERIA': 'NG',
+  'Kenya': 'KE', 'KENYA': 'KE',
+  'Hong Kong': 'HK', 'HONG KONG': 'HK',
+  'Taiwan': 'TW', 'TAIWAN': 'TW',
+};
+
+const extractCountryCode = (region) => {
+  if (!region) return '';
+  const trimmed = region.trim();
+  
+  // First try exact match
+  if (countryCodeMap[trimmed]) {
+    return countryCodeMap[trimmed];
+  }
+  
+  // Try uppercase match
+  const upper = trimmed.toUpperCase();
+  if (countryCodeMap[upper]) {
+    return countryCodeMap[upper];
+  }
+  
+  // If it's already a 2-letter code, return it
+  if (trimmed.length === 2) {
+    return trimmed.toUpperCase();
+  }
+  
+  return '';
+};
+
+const renderCountryFlag = (region) => {
+  const code = extractCountryCode(region);
+  if (!code) return null;
+  
+  const FlagComponent = Flag[code];
+  if (!FlagComponent) return null;
+  
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '16px', borderRadius: '2px', overflow: 'hidden', flexShrink: 0 }}>
+      <FlagComponent style={{ width: '20px', height: '13px' }} />
+    </div>
+  );
+};
 
 // Custom Dropdown Component with Icons
 const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
@@ -100,7 +195,7 @@ const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
 };
 
 // Generic Custom Dropdown Component (without icons)
-const CustomDropdown = ({ value, onChange, options }) => {
+const CustomDropdown = ({ value, onChange, options, showFlags = false }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -124,7 +219,10 @@ const CustomDropdown = ({ value, onChange, options }) => {
         }}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <span>{value || 'All'}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {showFlags && value && renderCountryFlag(value)}
+          {value || 'All'}
+        </span>
         <span style={{ fontSize: '12px' }}>▼</span>
       </button>
 
@@ -174,11 +272,15 @@ const CustomDropdown = ({ value, onChange, options }) => {
                 cursor: 'pointer',
                 backgroundColor: value === option ? '#dbeafe' : 'white',
                 borderBottom: '1px solid #e5e7eb',
-                fontSize: '14px'
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
               onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
               onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
             >
+              {showFlags && renderCountryFlag(option)}
               {option}
             </div>
           ))}
@@ -585,6 +687,7 @@ const Technographics = () => {
             value={filters.region}
             onChange={(value) => handleFilterChange('region', value)}
             options={getUniqueOptions('region')}
+            showFlags={true}
           />
         </div>
 
@@ -668,7 +771,10 @@ const Technographics = () => {
                     {highlightText(row.industry, searchTerm)}
                   </td>
                   <td onMouseEnter={(e) => handleMouseEnter(e, row.region)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.region, searchTerm)}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {renderCountryFlag(row.region)}
+                      {highlightText(row.region, searchTerm)}
+                    </span>
                   </td>
                   {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
                     {highlightText(row.category, searchTerm)}
