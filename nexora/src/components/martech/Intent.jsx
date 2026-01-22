@@ -1,9 +1,94 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { rowMatchesSearch, highlightText, Tooltip, createTooltipHandlers } from '../../utils/tableUtils';
- 
-const fakeintentDataRaw = [
-];
-  // This fake data is no longer used and can be removed.
+
+// Generic Custom Dropdown Component (without icons)
+const CustomDropdown = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        <span>{value || 'All'}</span>
+        <span style={{ fontSize: '12px' }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 1000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value === '' ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
+          >
+            All
+          </div>
+          {options.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value === option ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 
 const Intent = () => {
@@ -11,8 +96,7 @@ const Intent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   useEffect(() => {
@@ -41,7 +125,7 @@ const Intent = () => {
   const filteredData = tableData
     .filter(row => {
       const searchMatch = !searchTerm || Object.values(row).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
-      const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(row.intentStatus);
+      const statusMatch = !selectedStatus || row.intentStatus === selectedStatus;
       return searchMatch && statusMatch;
     })
     .sort((a, b) => {
@@ -58,24 +142,9 @@ const Intent = () => {
     return [...new Set(statuses)].sort();
   };
 
-  const handleStatusToggle = (status) => {
-    setSelectedStatuses(prev =>
-      prev.includes(status)
-        ? prev.filter(s => s !== status)
-        : [...prev, status]
-    );
-  };
-
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showStatusDropdown && !event.target.closest('.status-dropdown-container')) {
-        setShowStatusDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showStatusDropdown]);
+    // Cleanup if needed
+  }, []);
 
   const handleDownloadCSV = () => {
     if (filteredData.length === 0) return;
@@ -97,7 +166,7 @@ const Intent = () => {
   };
 
   if (loading) {
-    return <div>Loading Intent data...</div>;
+    return <div></div>;
   }
 
   if (error) {
@@ -107,8 +176,8 @@ const Intent = () => {
   return (
     <div className="intent-container">
       <div className="header-actions">
-        <h2>Intent</h2>
-        <div className="actions-right">
+        <h2>Intent Data</h2>
+        <div className="actions-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <div className="search-bar">
             <input
               type="text"
@@ -126,85 +195,24 @@ const Intent = () => {
 
       <div className="section-subtle-divider" />
 
-
+      {/* Dropdown filter commented out */}
+      {/* <div className="filters">
+        <div className="filter-group">
+          <label>Intent Status (Dropdown)</label>
+          <CustomDropdown
+            value={selectedStatus}
+            onChange={(value) => setSelectedStatus(value)}
+            options={getUniqueIntentStatuses()}
+          />
+        </div>
+      </div> */}
 
       <div className="table-container" style={{ backgroundColor: '#e8eef7' }}>
         <table>
           <thead className="sticky-header">
             <tr>
               <th>Account Name</th>
-              <th style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setShowStatusDropdown(!showStatusDropdown)}>
-                <span>Intent Status</span>
-                <span style={{ fontSize: '10px', border: '1px solid #d1d5db', padding: '2px 6px', borderRadius: '3px', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '20px', height: '20px', flexShrink: 0 }}>▼</span>
-                {showStatusDropdown && getUniqueIntentStatuses().length > 0 && (
-                  <div className="status-dropdown-container" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', zIndex: 1000 }}>
-                    <div style={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                      minWidth: '250px',
-                      maxHeight: '400px',
-                      overflowY: 'auto'
-                    }}>
-                      <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
-                          Select Intent Status
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                          {selectedStatuses.length} selected
-                        </div>
-                        {selectedStatuses.length > 0 && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedStatuses([]);
-                            }}
-                            style={{
-                              marginTop: '8px',
-                              padding: '4px 8px',
-                              fontSize: '12px',
-                              backgroundColor: '#ef4444',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Clear All
-                          </button>
-                        )}
-                      </div>
-                      <div style={{ padding: '8px' }}>
-                        {getUniqueIntentStatuses().map(status => (
-                          <label key={status} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '8px 12px',
-                            cursor: 'pointer',
-                            borderRadius: '4px',
-                            transition: 'background-color 0.15s ease'
-                          }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedStatuses.includes(status)}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleStatusToggle(status);
-                              }}
-                              style={{ marginRight: '8px', cursor: 'pointer' }}
-                            />
-                            <span style={{ fontSize: '13px', color: '#374151' }}>{status}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </th>
+              <th>Intent Status</th>
             </tr>
           </thead>
           <tbody>
@@ -228,11 +236,34 @@ const Intent = () => {
       <Tooltip tooltip={tooltip} />
 
       <style jsx>{`
+        .filters {
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap;
+          margin-bottom: 20px;
+        }
+
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          min-width: 150px;
+          max-width: 250px;
+        }
+
+        .filter-group label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #374151;
+        }
+
         .table-container {
           max-height: 400px;
           overflow-x: auto;
           overflow-y: auto;
           position: relative;
+          display: flex;
+          justify-content: center;
         }
 
         .sticky-header {
@@ -244,16 +275,16 @@ const Intent = () => {
         }
 
         table {
-          width: 95%;
+          width: 100%;
           border-collapse: collapse;
-          table-layout: fixed;
+          table-layout: auto;
         }
 
         th, td {
           padding: 12px 15px;
           border-bottom: 1px solid #ddd;
           white-space: nowrap;
-          overflow: visible;
+          overflow: hidden;
           text-overflow: ellipsis;
           cursor: default;
           background-color: #f8f9fa;
@@ -270,7 +301,7 @@ const Intent = () => {
         }
 
         th:nth-child(1), td:nth-child(1) { width: 50%; }
-        th:nth-child(2), td:nth-child(2) { width: 100%; }
+        th:nth-child(2), td:nth-child(2) { width: 50%; }
 
         td { position: relative; }
 

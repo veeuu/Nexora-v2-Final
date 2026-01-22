@@ -676,7 +676,6 @@ const RenewalIntelligence = () => {
                     background: linear-gradient(180deg, #ffffff, #fafbff);
                     border-radius: 12px;
                     padding: 1.25rem 1.5rem 1.5rem;
-                    box-shadow: 0 6px 20px rgba(27, 39, 94, 0.08);
                     width: 100%;
                     max-width: 100%;
                     overflow-x: hidden;

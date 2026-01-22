@@ -581,7 +581,7 @@ const HeatMap = () => {
                     </div>
                     <p className="text-gray-600">
                         {regions.length === 0
-                            ? 'Loading technology data...'
+                            ? ''
                             : country
                                 ? `No technology data available for "${country}".`
                                 : 'Select a region to see technology adoption.'}
@@ -1244,7 +1244,7 @@ const Summary = () => {
 
                     {loadingSankey ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '380px', color: '#6b7280' }}>
-                            Loading technology data...
+                            
                         </div>
                     ) : overallSankeyData.nodes.length === 0 ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '380px', color: '#6b7280' }}>

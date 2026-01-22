@@ -181,7 +181,7 @@ const BuyingGroup = () => {
     };
 
     return (
-        <div style={{ padding: '20px', backgroundColor: 'white', minHeight: '100vh' }}>
+        <div className="buying-group-container" style={{ padding: '20px', backgroundColor: 'white', minHeight: '100vh' }}>
             <h1 style={{ fontSize: 'clamp(1.2rem, 2vw, 1.4rem)', fontWeight: '700', color: '#1f2937', marginBottom: '20px' }}>
                 Buying Group
             </h1>

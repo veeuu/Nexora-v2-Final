@@ -101,7 +101,7 @@ const ProductCatalogue = () => {
   };
 
   if (loading) {
-    return <div>Loading Product Catalogue data...</div>;
+    return <div></div>;
   }
 
   if (error) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const Menu = ({ activeSection, onMenuClick, menuItems, onLogout }) => {
+const Menu = ({ activeSection, onMenuClick, menuItems, onLogout, username }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -51,11 +51,6 @@ const Menu = ({ activeSection, onMenuClick, menuItems, onLogout }) => {
           </li>
         ))}
       </ul>
-      <div className={`menu-footer ${isOpen ? 'open' : ''}`}>
-        <button className="sign-out-btn" onClick={() => onLogout && onLogout()}>
-          Sign Out
-        </button>
-      </div>
     </nav>
   );
 };

@@ -8,8 +8,17 @@ import './styles.css';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dashboardNav, setDashboardNav] = useState(null);
+  const [username, setUsername] = useState('');
 
-  const handleLogout = () => setIsAuthenticated(false);
+  const handleLogin = (user) => {
+    setUsername(user);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUsername('');
+  };
 
   const handleChatbotNavigate = (page) => {
     if (dashboardNav) {
@@ -20,11 +29,11 @@ function App() {
   return (
     <div className="App">
       {isAuthenticated ? (
-        <Dashboard onLogout={handleLogout} onNavRef={setDashboardNav} />
+        <Dashboard onLogout={handleLogout} onNavRef={setDashboardNav} username={username} />
       ) : (
-        <Login onLogin={setIsAuthenticated} />
+        <Login onLogin={handleLogin} />
       )}
-      <ChatBot isAuthenticated={isAuthenticated} onNavigate={handleChatbotNavigate} />
+      {/* <ChatBot isAuthenticated={isAuthenticated} onNavigate={handleChatbotNavigate} /> */}
     </div>
   );
 }

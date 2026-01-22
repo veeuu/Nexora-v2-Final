@@ -383,7 +383,7 @@ const NTP = () => {
   };
 
   if (loading) {
-    return <div>Loading NTP data...</div>;
+    return <div></div>;
   }
 
   if (error) {

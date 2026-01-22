@@ -17,9 +17,9 @@ import BuyerGroup from './market/BuyerGroup';
 import Growth from './market/Growth';
 import MutualFund from './market/MutualFund'; // Added import for MutualFund
 
-const Dashboard = ({ onLogout, onNavRef }) => {
+const Dashboard = ({ onLogout, onNavRef, username }) => {
   const [activeView, setActiveView] = useState('Martech');
-  const [activeSection, setActiveSection] = useState('Summary');
+  const [activeSection, setActiveSection] = useState('Technographics');
   const [selectedRegion, setSelectedRegion] = useState('');
 
   const handleDropdownChange = (value) => {
@@ -115,13 +115,14 @@ const Dashboard = ({ onLogout, onNavRef }) => {
   return (
     <IndustryProvider>
       <div className="dashboard">
-        <Header onDropdownChange={handleDropdownChange} onRegionChange={handleRegionChange} />
+        <Header onDropdownChange={handleDropdownChange} onRegionChange={handleRegionChange} username={username} onLogout={onLogout} />
         <div className="dashboard-content">
           <Menu
             activeSection={activeSection}
             onMenuClick={handleMenuClick}
             menuItems={getMenuItems()}
             onLogout={onLogout}
+            username={username}
           />
           <main className="main-content">
             {renderActiveSection()}

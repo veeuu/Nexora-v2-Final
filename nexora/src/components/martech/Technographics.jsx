@@ -541,7 +541,7 @@ const Technographics = () => {
     });
 
   if (loading) {
-    return <div>Loading Technographics data...</div>;
+    return <div></div>;
   }
 
   if (error) {
