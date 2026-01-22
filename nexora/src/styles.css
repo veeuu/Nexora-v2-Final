@@ -27,7 +27,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 0.75rem 2rem 0.75rem 0.5rem;
-  background-color: #dce6f0;
+  background: radial-gradient(circle, rgba(24, 143, 255, 0.29) 0%, transparent 70%), #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: calc(100% - 180px);
   left: 180px;
@@ -67,6 +67,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  outline: none;
+}
+
+.profile-avatar-btn:focus {
+  outline: none;
 }
 
 .profile-avatar {
@@ -83,6 +88,12 @@ body {
   flex-shrink: 0;
   cursor: pointer;
   transition: transform 0.2s;
+  outline: none;
+  border: none;
+}
+
+.profile-avatar:focus {
+  outline: none;
 }
 
 .profile-avatar:hover {
@@ -235,7 +246,7 @@ body {
 
 .menu {
   width: 220px;
-  background-color: #2c3e50;
+  background: linear-gradient(135deg, #0d2439eb 0%, #0050b3 100%);
   padding: 0;
   box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -346,7 +357,7 @@ body {
 }
 
 .menu-items li.active {
-  background-color: #1890ff;
+  background-color: #1d42655a;
   border-left: 3px solid #fff;
   font-weight: 500;
   color: #fff;
