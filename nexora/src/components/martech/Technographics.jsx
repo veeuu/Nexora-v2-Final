@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useIndustry } from '../../context/IndustryContext';
 import * as SiIcons from 'react-icons/si';
 import Flag from 'country-flag-icons/react/3x2';
@@ -100,11 +100,41 @@ const renderCountryFlag = (region) => {
 // Custom Dropdown Component with Icons
 const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleButtonClick = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={handleButtonClick}
         style={{
           width: '100%',
           padding: '10px 12px',
@@ -121,7 +151,6 @@ const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
           gap: '8px',
           justifyContent: 'space-between'
         }}
-        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {value && renderIcon(value)}
@@ -132,18 +161,19 @@ const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
 
       {isOpen && (
         <div
+          ref={dropdownRef}
           style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
+            position: 'fixed',
+            top: `${dropdownPos.top}px`,
+            left: `${dropdownPos.left}px`,
+            width: `${dropdownPos.width}px`,
             backgroundColor: 'white',
             border: '1px solid #d1d5db',
             borderRadius: '6px',
             marginTop: '4px',
-            maxHeight: '300px',
+            maxHeight: '400px',
             overflowY: 'auto',
-            zIndex: 1000,
+            zIndex: 10000,
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
           }}
         >
@@ -194,14 +224,246 @@ const CustomTechDropdown = ({ value, onChange, options, renderIcon }) => {
   );
 };
 
-// Generic Custom Dropdown Component (without icons)
-const CustomDropdown = ({ value, onChange, options, showFlags = false }) => {
+// Multi-Select Dropdown Component with Search
+const MultiSelectDropdown = ({ value, onChange, options }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const handleButtonClick = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
+  const handleToggleCompany = (company) => {
+    if (value.includes(company)) {
+      onChange(value.filter(c => c !== company));
+    } else {
+      onChange([...value, company]);
+    }
+  };
+
+  const filteredOptions = options.filter(option =>
+    option.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={handleButtonClick}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontFamily: 'inherit',
+          backgroundColor: 'white',
+          cursor: 'pointer',
+          transition: 'border-color 0.2s',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '40px'
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+          {value.length === 0 ? (
+            'Select Company Name'
+          ) : (
+            <span style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {value.slice(0, 2).map((company, idx) => (
+                <span key={idx} style={{
+                  backgroundColor: '#dbeafe',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {company}
+                </span>
+              ))}
+              {value.length > 2 && (
+                <span style={{
+                  backgroundColor: '#dbeafe',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px'
+                }}>
+                  +{value.length - 2}
+                </span>
+              )}
+            </span>
+          )}
+        </span>
+        <span style={{ fontSize: '12px', flexShrink: 0 }}>▼</span>
+      </button>
+
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          style={{
+            position: 'fixed',
+            top: `${dropdownPos.top}px`,
+            left: `${dropdownPos.left}px`,
+            width: `${dropdownPos.width}px`,
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            marginTop: '4px',
+            maxHeight: '400px',
+            overflowY: 'auto',
+            zIndex: 10000,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <div style={{ padding: '8px', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0, backgroundColor: 'white' }}>
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search companies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                fontSize: '13px',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          <div
+            onClick={() => {
+              onChange([]);
+              setSearchTerm('');
+            }}
+            style={{
+              padding: '10px 12px',
+              cursor: 'pointer',
+              backgroundColor: value.length === 0 ? '#f3f4f6' : 'white',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '14px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = value.length === 0 ? '#f3f4f6' : 'white'}
+          >
+            NULL
+          </div>
+
+          {filteredOptions.map((option, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleToggleCompany(option)}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                backgroundColor: value.includes(option) ? '#dbeafe' : 'white',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                whiteSpace: 'normal',
+                wordWrap: 'break-word'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = value.includes(option) ? '#dbeafe' : 'white'}
+            >
+              <input
+                type="checkbox"
+                checked={value.includes(option)}
+                onChange={() => {}}
+                style={{ cursor: 'pointer' }}
+              />
+              {option}
+            </div>
+          ))}
+
+          {filteredOptions.length === 0 && (
+            <div style={{ padding: '10px 12px', color: '#999', textAlign: 'center' }}>
+              No companies found
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Generic Custom Dropdown Component (without icons)
+const CustomDropdown = ({ value, onChange, options, showFlags = false, isCompanyFilter = false }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleButtonClick = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <button
+        ref={buttonRef}
+        onClick={handleButtonClick}
         style={{
           width: '100%',
           padding: '10px 12px',
@@ -217,29 +479,29 @@ const CustomDropdown = ({ value, onChange, options, showFlags = false }) => {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}
-        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {showFlags && value && renderCountryFlag(value)}
-          {value || 'All'}
+          {value || (isCompanyFilter ? 'Select Company Name' : 'All')}
         </span>
-        <span style={{ fontSize: '12px' }}>▼</span>
+        <span style={{ fontSize: '12px', flexShrink: 0 }}>▼</span>
       </button>
 
       {isOpen && (
         <div
+          ref={dropdownRef}
           style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
+            position: 'fixed',
+            top: `${dropdownPos.top}px`,
+            left: `${dropdownPos.left}px`,
+            width: `${dropdownPos.width}px`,
             backgroundColor: 'white',
             border: '1px solid #d1d5db',
             borderRadius: '6px',
             marginTop: '4px',
-            maxHeight: '300px',
+            maxHeight: '400px',
             overflowY: 'auto',
-            zIndex: 1000,
+            zIndex: 10000,
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
           }}
         >
@@ -253,12 +515,14 @@ const CustomDropdown = ({ value, onChange, options, showFlags = false }) => {
               cursor: 'pointer',
               backgroundColor: value === '' ? '#f3f4f6' : 'white',
               borderBottom: '1px solid #e5e7eb',
-              fontSize: '14px'
+              fontSize: '14px',
+              whiteSpace: 'normal',
+              wordWrap: 'break-word'
             }}
             onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
             onMouseLeave={(e) => e.target.style.backgroundColor = value === '' ? '#f3f4f6' : 'white'}
           >
-            All
+            {isCompanyFilter ? 'NULL' : 'All'}
           </div>
           {options.map((option, idx) => (
             <div
@@ -275,7 +539,9 @@ const CustomDropdown = ({ value, onChange, options, showFlags = false }) => {
                 fontSize: '14px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+                whiteSpace: 'normal',
+                wordWrap: 'break-word'
               }}
               onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
               onMouseLeave={(e) => e.target.style.backgroundColor = value === option ? '#dbeafe' : 'white'}
@@ -359,7 +625,7 @@ const Technographics = () => {
   const { setIndustryData, setTechnologyData, setAvailableRegions } = useIndustry();
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
   const [filters, setFilters] = useState({
-    companyName: '',
+    companyName: [],
     region: '',
     technology: '',
     category: ''
@@ -622,6 +888,11 @@ const Technographics = () => {
   const filteredData = tableData
     .filter(row => {
       const filterMatches = Object.keys(filters).every(key => {
+        if (key === 'companyName') {
+          // For company name, check if it's in the selected array or if array is empty
+          if (filters[key].length === 0) return true;
+          return filters[key].includes(String(row[key]));
+        }
         if (!filters[key]) return true;
         return String(row[key]) === filters[key];
       });
@@ -674,7 +945,7 @@ const Technographics = () => {
       <div className="filters">
         <div className="filter-group">
           <label>Company Name</label>
-          <CustomDropdown
+          <MultiSelectDropdown
             value={filters.companyName}
             onChange={(value) => handleFilterChange('companyName', value)}
             options={getUniqueOptions('companyName')}
@@ -726,74 +997,84 @@ const Technographics = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, index) => {
-              const isHighlighted = rowMatchesSearch(row);
+            {filters.companyName.length > 0 ? (
+              filteredData.length > 0 ? (
+                filteredData.map((row, index) => {
+                  const isHighlighted = rowMatchesSearch(row);
 
-              const handleMouseEnter = (e, text) => {
-                const rect = e.target.getBoundingClientRect();
-                setTooltip({
-                  show: true,
-                  text: text,
-                  x: rect.right - 20,
-                  y: rect.bottom + 20
-                });
-              };
+                  const handleMouseEnter = (e, text) => {
+                    const rect = e.target.getBoundingClientRect();
+                    setTooltip({
+                      show: true,
+                      text: text,
+                      x: rect.right - 20,
+                      y: rect.bottom + 20
+                    });
+                  };
 
-              const handleMouseLeave = () => {
-                setTooltip({ show: false, text: '', x: 0, y: 0 });
-              };
+                  const handleMouseLeave = () => {
+                    setTooltip({ show: false, text: '', x: 0, y: 0 });
+                  };
 
-              const handleCompanyNameMouseEnter = (e, companyName) => {
-                const rect = e.target.getBoundingClientRect();
-                setTooltip({
-                  show: true,
-                  text: companyName,
-                  hint: 'Click to view NTP Analysis',
-                  x: rect.right - 20,
-                  y: rect.bottom + 20,
-                  isCompanyName: true
-                });
-              };
+                  const handleCompanyNameMouseEnter = (e, companyName) => {
+                    const rect = e.target.getBoundingClientRect();
+                    setTooltip({
+                      show: true,
+                      text: companyName,
+                      hint: 'Click to view NTP Analysis',
+                      x: rect.right - 20,
+                      y: rect.bottom + 20,
+                      isCompanyName: true
+                    });
+                  };
 
-              return (
-                <tr 
-                  key={index} 
-                  style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent', cursor: 'pointer' }}
-                  onClick={() => setSelectedCompany(row.companyName)}
-                >
-                  <td onMouseEnter={(e) => handleCompanyNameMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.companyName, searchTerm)}
+                  return (
+                    <tr 
+                      key={index} 
+                      style={{ backgroundColor: isHighlighted ? '#fefce8' : 'transparent', cursor: 'pointer' }}
+                      onClick={() => setSelectedCompany(row.companyName)}
+                    >
+                      <td onMouseEnter={(e) => handleCompanyNameMouseEnter(e, row.companyName)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.companyName, searchTerm)}
+                      </td>
+                      <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.domain, searchTerm)}
+                      </td>
+                      <td onMouseEnter={(e) => handleMouseEnter(e, row.industry)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.industry, searchTerm)}
+                      </td>
+                      <td onMouseEnter={(e) => handleMouseEnter(e, row.region)} onMouseLeave={handleMouseLeave}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {renderCountryFlag(row.region)}
+                          {highlightText(row.region, searchTerm)}
+                        </span>
+                      </td>
+                      {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.category, searchTerm)}
+                      </td> */}
+                      <td onMouseEnter={(e) => handleMouseEnter(e, row.technology)} onMouseLeave={handleMouseLeave}>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          {renderTechIcon(row.technology)}
+                          {highlightText(row.technology, searchTerm)}
+                        </span>
+                      </td>
+                      {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.previousDetectedDate)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.previousDetectedDate, searchTerm)}
+                      </td> */}
+                      {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.latestDetectedDate)} onMouseLeave={handleMouseLeave}>
+                        {highlightText(row.latestDetectedDate, searchTerm)}
+                      </td> */}
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                    No data found for the selected company
                   </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.domain)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.domain, searchTerm)}
-                  </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.industry)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.industry, searchTerm)}
-                  </td>
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.region)} onMouseLeave={handleMouseLeave}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {renderCountryFlag(row.region)}
-                      {highlightText(row.region, searchTerm)}
-                    </span>
-                  </td>
-                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.category)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.category, searchTerm)}
-                  </td> */}
-                  <td onMouseEnter={(e) => handleMouseEnter(e, row.technology)} onMouseLeave={handleMouseLeave}>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>
-                      {renderTechIcon(row.technology)}
-                      {highlightText(row.technology, searchTerm)}
-                    </span>
-                  </td>
-                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.previousDetectedDate)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.previousDetectedDate, searchTerm)}
-                  </td> */}
-                  {/* <td onMouseEnter={(e) => handleMouseEnter(e, row.latestDetectedDate)} onMouseLeave={handleMouseLeave}>
-                    {highlightText(row.latestDetectedDate, searchTerm)}
-                  </td> */}
                 </tr>
-              );
-            })}
+              )
+            ) : null}
           </tbody>
         </table>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FaLinkedin } from 'react-icons/fa';
 import img1 from './assests/1Rivet_India.png';
 import img2 from './assests/2Base_Technologies_Pvt_Ltd_India.png';
 import img3 from './assests/2Coms_Consulting_INDIA.png';
@@ -9,6 +10,12 @@ import img7 from './assests/10XDS_INDIA.png';
 import img8 from './assests/42Gears_Mobility_Systems_Pvt_Limited_India.png';
 import img9 from './assests/300_Innovative_Solutions_INDIA.png';
 import img10 from './assests/Cpl3_Bhingar_Urban_Bank_Galaxy_Office_Automation_India.png';
+import svg1 from './assests/Accenture_India_PVT_Ltd_INDIA.svg';
+import svg2 from './assests/Allstate_India_Private_Limited_INDIA.svg';
+import svg3 from './assests/Alten_India_Private_Limited_INDIA.svg';
+import svg4 from './assests/Anand_Rathi_Wealth_Limited_INDIA.svg';
+import svg5 from './assests/Apexon_Formerly_Infostretch_INDIA.svg';
+import svg6 from './assests/ASM_Technologies_INDIA.svg';
 
 const BuyingGroup = () => {
     // Parse CSV data
@@ -99,14 +106,42 @@ const BuyingGroup = () => {
             name: '4G Identity Solutions Pvt. Limited',
             imageUrl: img6
         },
+        {
+            id: 11,
+            name: 'Accenture India Pvt Ltd',
+            imageUrl: svg1
+        },
+        {
+            id: 12,
+            name: 'Allstate India Private Limited',
+            imageUrl: svg2
+        },
+        {
+            id: 13,
+            name: 'Alten India Private Limited',
+            imageUrl: svg3
+        },
+        {
+            id: 14,
+            name: 'Anand Rathi Wealth Limited',
+            imageUrl: svg4
+        },
+        {
+            id: 15,
+            name: 'Apexon Formerly Infostretch',
+            imageUrl: svg5
+        },
+        {
+            id: 16,
+            name: 'ASM Technologies',
+            imageUrl: svg6
+        },
     ];
 
     const [selectedCompany, setSelectedCompany] = useState(companyData[0].id);
     const [imageError, setImageError] = useState(false);
     const [hoveredPerson, setHoveredPerson] = useState(null);
     const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-    const [isPopupHovered, setIsPopupHovered] = useState(false);
-    const [copiedField, setCopiedField] = useState(null);
     const [personDetailsData, setPersonDetailsData] = useState({});
 
     // Load CSV data on component mount
@@ -162,22 +197,6 @@ const BuyingGroup = () => {
 
     const handleContainerMouseLeave = () => {
         setHoveredPerson(null);
-        setIsPopupHovered(false);
-    };
-
-    const handlePopupMouseEnter = () => {
-        setIsPopupHovered(true);
-    };
-
-    const handlePopupMouseLeave = () => {
-        setIsPopupHovered(false);
-        setHoveredPerson(null);
-    };
-
-    const copyToClipboard = (text, field) => {
-        navigator.clipboard.writeText(text);
-        setCopiedField(field);
-        setTimeout(() => setCopiedField(null), 2000);
     };
 
     return (
@@ -247,8 +266,6 @@ const BuyingGroup = () => {
                                 {/* Hover Popup */}
                                 {hoveredPerson && (
                                     <div
-                                        onMouseEnter={handlePopupMouseEnter}
-                                        onMouseLeave={handlePopupMouseLeave}
                                         style={{
                                             position: 'absolute',
                                             left: `${popupPosition.x}px`,
@@ -294,110 +311,37 @@ const BuyingGroup = () => {
                                             }}>
                                                 <strong>Email:</strong>
                                             </p>
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                marginBottom: '10px'
+                                            <p style={{
+                                                margin: '0 0 10px 0',
+                                                fontSize: '12px',
+                                                color: '#374151',
+                                                wordBreak: 'break-all'
                                             }}>
-                                                <p style={{
-                                                    margin: '0',
-                                                    fontSize: '12px',
-                                                    color: '#374151',
-                                                    wordBreak: 'break-all',
-                                                    flex: 1
-                                                }}>
-                                                    {hoveredPerson.email}
-                                                </p>
-                                                <button
-                                                    onClick={() => copyToClipboard(hoveredPerson.email, 'email')}
-                                                    style={{
-                                                        padding: '4px 8px',
-                                                        fontSize: '11px',
-                                                        backgroundColor: copiedField === 'email' ? '#10b981' : '#f3f4f6',
-                                                        color: copiedField === 'email' ? 'white' : '#374151',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        fontWeight: '500',
-                                                        transition: 'all 0.2s',
-                                                        whiteSpace: 'nowrap'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        if (copiedField !== 'email') {
-                                                            e.target.style.backgroundColor = '#e5e7eb';
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        if (copiedField !== 'email') {
-                                                            e.target.style.backgroundColor = '#f3f4f6';
-                                                        }
-                                                    }}
-                                                >
-                                                    {copiedField === 'email' ? '✓ Copied' : 'Copy'}
-                                                </button>
-                                            </div>
+                                                {hoveredPerson.email}
+                                            </p>
 
-                                            <div style={{
-                                                display: 'flex',
-                                                gap: '8px',
-                                                flexWrap: 'wrap'
-                                            }}>
-                                                <a
-                                                    href={hoveredPerson.linkedin}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    style={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        fontSize: '12px',
-                                                        color: '#0a66c2',
-                                                        textDecoration: 'none',
-                                                        fontWeight: '500',
-                                                        padding: '6px 10px',
-                                                        backgroundColor: '#f0f7ff',
-                                                        borderRadius: '4px',
-                                                        transition: 'background-color 0.2s',
-                                                        border: 'none',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#e0f0ff'}
-                                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f7ff'}
-                                                >
-                                                    🔗 LinkedIn
-                                                </a>
-
-                                                <button
-                                                    onClick={() => copyToClipboard(hoveredPerson.linkedin, 'linkedin')}
-                                                    style={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        fontSize: '12px',
-                                                        color: copiedField === 'linkedin' ? 'white' : '#6b7280',
-                                                        fontWeight: '500',
-                                                        padding: '6px 10px',
-                                                        backgroundColor: copiedField === 'linkedin' ? '#10b981' : '#f3f4f6',
-                                                        borderRadius: '4px',
-                                                        transition: 'all 0.2s',
-                                                        border: 'none',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        if (copiedField !== 'linkedin') {
-                                                            e.target.style.backgroundColor = '#e5e7eb';
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        if (copiedField !== 'linkedin') {
-                                                            e.target.style.backgroundColor = '#f3f4f6';
-                                                        }
-                                                    }}
-                                                >
-                                                    {copiedField === 'linkedin' ? '✓ Copied' : '📋 Copy Link'}
-                                                </button>
-                                            </div>
+                                            <a
+                                                href={hoveredPerson.linkedin}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    backgroundColor: '#0a66c2',
+                                                    borderRadius: '4px',
+                                                    textDecoration: 'none',
+                                                    transition: 'background-color 0.2s',
+                                                    cursor: 'pointer'
+                                                }}
+                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#084a94'}
+                                                onMouseLeave={(e) => e.target.style.backgroundColor = '#0a66c2'}
+                                                title="Visit LinkedIn Profile"
+                                            >
+                                                <FaLinkedin size={18} color="white" />
+                                            </a>
                                         </div>
                                     </div>
                                 )}

@@ -263,9 +263,10 @@ body {
 .menu-header {
   display: flex;
   align-items: center;
-  padding: 1.5rem 1.5rem 1rem;
+  justify-content: center;
+  padding: 1.5rem 1.5rem 2rem;
   border-bottom: 1px solid #1a252f;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-weight: 600;
   font-size: 1rem;
   cursor: default;
@@ -374,6 +375,7 @@ body {
   margin-top: auto;
   position: relative;
   z-index: 101;
+  background: radial-gradient(circle, rgba(24, 143, 255, 0.29) 0%, transparent 70%), #ffffff;
 }
 
 .menu-proplus-link {
